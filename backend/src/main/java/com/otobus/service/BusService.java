@@ -27,4 +27,8 @@ public class BusService {
     public List<Bus> getAllBuses() {
         return busRepository.findAll();
     }
+
+    public void deleteBus(Long id) {
+    busRepository.deleteById(id);
+}
 }

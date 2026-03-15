@@ -30,4 +30,8 @@ public class CityService {
     public List<City> getAllCities() {
         return cityRepository.findAll();
     }
+
+    public void deleteCity(Long id) {
+    cityRepository.deleteById(id);
+}
 }
