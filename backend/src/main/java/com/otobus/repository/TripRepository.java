@@ -1,5 +1,11 @@
 package com.otobus.repository;
 
-public interface TripRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
+import com.otobus.entity.Trip;
+
+@Repository
+public interface TripRepository extends JpaRepository<Trip, Long> {
+    
 }
