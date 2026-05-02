@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Paneli | OtoBilet</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav>
+        <a href="index.html" class="logo">Oto<span>Bilet</span> Admin</a>
+        <div class="nav-links">
+            <a href="#" id="navLogout" style="color: var(--text-muted);">Çıkış Yap</a>
+        </div>
+    </nav>
+
+    <div class="container" style="margin-top: 2rem;">
+        <h2>Bekleyen Sefer Onayları</h2>
+        <div id="pendingTrips" style="margin-top: 1rem; display: flex; flex-direction: column; gap: 1rem;">
+            <!-- Trips will be injected here -->
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const role = getUserRole();
+            if (role !== 'ADMIN') {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            const container = document.getElementById('pendingTrips');
+            
+            async function loadPending() {
+                try {
+                    const trips = await fetchApi('/trips/admin/pending');
+                    container.innerHTML = '';
+                    if (trips.length === 0) {
+                        container.innerHTML = '<p>Onay bekleyen sefer yok.</p>';
+                        return;
+                    }
+                    
+                    trips.forEach(trip => {
+                        const div = document.createElement('div');
+                        div.className = 'ticket-card';
+                        div.style.display = 'flex';
+                        div.style.justifyContent = 'space-between';
+                        div.style.alignItems = 'center';
+                        div.innerHTML = `
+                            <div>
+                                <h3>Sefer ID: ${trip.id} - ${trip.otobus.company.name}</h3>
+                                <p>Tarih: ${trip.kalkisSaati} | Fiyat: ${trip.fiyat} TL</p>
+                                <p>Duraklar: ${trip.stops ? trip.stops.map(s => s.terminal.name).join(' -> ') : 'Bilinmiyor'}</p>
+                            </div>
+                            <button class="btn btn-primary approve-btn" data-id="${trip.id}">Onayla</button>
+                        `;
+                        container.appendChild(div);
+                    });
+
+                    document.querySelectorAll('.approve-btn').forEach(btn => {
+                        btn.addEventListener('click', async (e) => {
+                            const id = e.target.getAttribute('data-id');
+                            await fetchApi(`/trips/admin/approve/${id}`, { method: 'POST' });
+                            alert('Sefer onaylandı!');
+                            loadPending();
+                        });
+                    });
+                } catch (e) {
+                    container.innerHTML = `<p style="color:red">Hata: ${e.message}</p>`;
+                }
+            }
+
+            loadPending();
+        });
+    </script>
+</body>
+</html>

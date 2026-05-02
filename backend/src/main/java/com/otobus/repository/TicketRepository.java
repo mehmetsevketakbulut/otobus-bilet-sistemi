@@ -9,6 +9,12 @@ import com.otobus.entity.Ticket;
 
 @Repository
 public interface TicketRepository extends JpaRepository<Ticket, Long> {
-    // Belirli bir seferde, belirli bir koltuk numarasını bulmaya yarar
-    Optional<Ticket> findByTripIdAndKoltukNo(Long tripId, int koltukNo);
+       @org.springframework.data.jpa.repository.Query("SELECT t FROM Ticket t WHERE t.trip.id = :tripId AND t.koltukNo = :koltukNo "
+                     +
+                     "AND t.fromStop.stopOrder < :reqToOrder AND t.toStop.stopOrder > :reqFromOrder")
+       java.util.List<Ticket> findOverlappingTickets(
+                     @org.springframework.data.repository.query.Param("tripId") Long tripId,
+                     @org.springframework.data.repository.query.Param("koltukNo") int koltukNo,
+                     @org.springframework.data.repository.query.Param("reqFromOrder") int reqFromOrder,
+                     @org.springframework.data.repository.query.Param("reqToOrder") int reqToOrder);
 }

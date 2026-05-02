@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Otobüs Bileti Al | OtoBilet</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <nav>
+        <a href="index.html" class="logo">Oto<span>Bilet</span></a>
+        <div class="nav-links">
+            <a href="#" id="navProfile" style="display: none;">Profilim</a>
+            <a href="login.html" id="navLogin">Üye Girişi</a>
+            <a href="register.html" id="navRegister" class="btn btn-primary" style="padding: 0.4rem 1rem;">Üye Ol</a>
+            <a href="#" id="navLogout" style="display: none; color: var(--text-muted);">Çıkış Yap</a>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="container" style="padding: 0;">
+            <h1>Türkiye'nin Lider Otobüs Bileti Sitesi</h1>
+            
+            <form id="searchForm" action="search-results.html" class="search-box">
+                <div class="search-group">
+                    <label>Nereden</label>
+                    <input type="text" id="fromCity" class="search-control" placeholder="İl veya ilçe adı yazın" value="İstanbul" required>
+                </div>
+                
+                <div class="search-group" style="flex: 0.1; text-align: center; cursor: pointer;" id="swapBtn">
+                    <!-- Swap Icon Placeholder -->
+                    <span style="font-size: 1.5rem; color: var(--text-muted);">⇄</span>
+                </div>
+
+                <div class="search-group">
+                    <label>Nereye</label>
+                    <input type="text" id="toCity" class="search-control" placeholder="İl veya ilçe adı yazın" value="Ankara" required>
+                </div>
+                
+                <div class="search-group">
+                    <div class="date-controls">
+                        <button type="button" class="date-btn" id="btnToday">Bugün</button>
+                        <button type="button" class="date-btn active" id="btnTomorrow">Yarın</button>
+                    </div>
+                    <input type="date" id="tripDate" class="search-control" required>
+                </div>
+                
+                <button type="submit" class="search-btn">Otobüs Bileti Bul</button>
+            </form>
+        </div>
+    </section>
+
+    <div class="container">
+        <h2 style="margin-bottom: 1rem; text-align: center; color: var(--text-muted);">Popüler Güzergahlar</h2>
+        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+            <div class="ticket-card" style="width: 300px; cursor: pointer; display: block; text-align: center;">
+                <h3 style="color: var(--primary);">İstanbul - Ankara</h3>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem;">En ucuz 400 TL</p>
+            </div>
+            <div class="ticket-card" style="width: 300px; cursor: pointer; display: block; text-align: center;">
+                <h3 style="color: var(--primary);">İstanbul - İzmir</h3>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem;">En ucuz 550 TL</p>
+            </div>
+            <div class="ticket-card" style="width: 300px; cursor: pointer; display: block; text-align: center;">
+                <h3 style="color: var(--primary);">Ankara - İzmir</h3>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem;">En ucuz 450 TL</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        // Set dates
+        const today = new Date();
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+
+        const dateInput = document.getElementById('tripDate');
+        dateInput.value = tomorrow.toISOString().split('T')[0]; // Default to tomorrow like obilet
+
+        document.getElementById('btnToday').addEventListener('click', function() {
+            dateInput.value = today.toISOString().split('T')[0];
+            this.classList.add('active');
+            document.getElementById('btnTomorrow').classList.remove('active');
+        });
+
+        document.getElementById('btnTomorrow').addEventListener('click', function() {
+            dateInput.value = tomorrow.toISOString().split('T')[0];
+            this.classList.add('active');
+            document.getElementById('btnToday').classList.remove('active');
+        });
+
+        // Swap cities
+        document.getElementById('swapBtn').addEventListener('click', () => {
+            const from = document.getElementById('fromCity');
+            const to = document.getElementById('toCity');
+            const temp = from.value;
+            from.value = to.value;
+            to.value = temp;
+        });
+
+        // Search Form Submission
+        document.getElementById('searchForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const from = document.getElementById('fromCity').value;
+            const to = document.getElementById('toCity').value;
+            const date = document.getElementById('tripDate').value;
+            window.location.href = `search-results.html?from=${from}&to=${to}&date=${date}`;
+        });
+    </script>
+</body>
+</html>

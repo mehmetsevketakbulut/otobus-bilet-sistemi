@@ -24,14 +24,15 @@ public class TicketController {
     }
 
     @PostMapping("/buy")
-    public Ticket buyTicket(@RequestBody Ticket bilet) {
+    public Ticket buyTicket(@RequestBody com.otobus.dto.request.TicketBuyRequest bilet) {
         return ticketService.biletKes(bilet);
     }
+
     @GetMapping("/all")
     public List<Ticket> getAllTickets() {
         return ticketService.tumBiletleriGetir();
     }
-    
+
     @DeleteMapping("/cancel/{id}")
     public void cancelTicket(@PathVariable Long id) {
         ticketService.biletIptalEt(id);

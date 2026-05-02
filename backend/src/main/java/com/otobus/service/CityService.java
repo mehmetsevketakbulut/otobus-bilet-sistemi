@@ -19,7 +19,8 @@ public class CityService {
     // 1. KURAL: Aynı isimde şehir iki defa eklenemesin!
     public City addCity(City city) {
         if (cityRepository.existsByName(city.getName())) {
-            // Eğer veritabanında bu isimde bir şehir varsa, kaydetmeyi durdur ve hata fırlat.
+            // Eğer veritabanında bu isimde bir şehir varsa, kaydetmeyi durdur ve hata
+            // fırlat.
             throw new RuntimeException("Bu isimde bir şehir zaten sistemde kayıtlı: " + city.getName());
         }
         // Eğer sorun yoksa şehri veritabanına kaydet.
@@ -32,6 +33,6 @@ public class CityService {
     }
 
     public void deleteCity(Long id) {
-    cityRepository.deleteById(id);
-}
+        cityRepository.deleteById(id);
+    }
 }

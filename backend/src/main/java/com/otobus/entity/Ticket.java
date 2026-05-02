@@ -21,15 +21,59 @@ public class Ticket {
     private String yolcuAdSoyad;
     private int koltukNo;
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    @ManyToOne
+    @JoinColumn(name = "from_stop_id")
+    private TripStop fromStop;
 
-    public Trip getTrip() { return trip; }
-    public void setTrip(Trip trip) { this.trip = trip; }
+    @ManyToOne
+    @JoinColumn(name = "to_stop_id")
+    private TripStop toStop;
 
-    public String getYolcuAdSoyad() { return yolcuAdSoyad; }
-    public void setYolcuAdSoyad(String yolcuAdSoyad) { this.yolcuAdSoyad = yolcuAdSoyad; }
+    public Long getId() {
+        return id;
+    }
 
-    public int getKoltukNo() { return koltukNo; }
-    public void setKoltukNo(int koltukNo) { this.koltukNo = koltukNo; }
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Trip getTrip() {
+        return trip;
+    }
+
+    public void setTrip(Trip trip) {
+        this.trip = trip;
+    }
+
+    public String getYolcuAdSoyad() {
+        return yolcuAdSoyad;
+    }
+
+    public void setYolcuAdSoyad(String yolcuAdSoyad) {
+        this.yolcuAdSoyad = yolcuAdSoyad;
+    }
+
+    public int getKoltukNo() {
+        return koltukNo;
+    }
+
+    public void setKoltukNo(int koltukNo) {
+        this.koltukNo = koltukNo;
+    }
+
+    public TripStop getFromStop() {
+        return fromStop;
+    }
+
+    public void setFromStop(TripStop fromStop) {
+        this.fromStop = fromStop;
+    }
+
+    public TripStop getToStop() {
+        return toStop;
+    }
+
+    public void setToStop(TripStop toStop) {
+        this.toStop = toStop;
+    }
 }

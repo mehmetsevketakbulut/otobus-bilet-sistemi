@@ -29,6 +29,6 @@ public class BusService {
     }
 
     public void deleteBus(Long id) {
-    busRepository.deleteById(id);
-}
+        busRepository.deleteById(id);
+    }
 }
