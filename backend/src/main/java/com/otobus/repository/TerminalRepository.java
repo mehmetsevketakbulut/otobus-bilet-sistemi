@@ -6,8 +6,4 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TerminalRepository extends JpaRepository<Terminal, Long> {
-    
-
-    // JpaRepository sayesinde kaydet, sil, bul (save, delete, findById) gibi 
-    // tüm temel metotlar otomatik olarak buraya miras geldi.
 }

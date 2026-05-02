@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giriş Yap | Otobüs Bilet Sistemi</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <nav>
+        <a href="index.html" class="logo">Oto<span>Bilet</span></a>
+        <div class="nav-links">
+            <a href="index.html">Ana Sayfa</a>
+            <a href="register.html">Kayıt Ol</a>
+        </div>
+    </nav>
+
+    <div class="container auth-container">
+        <div class="glass-card">
+            <h2>Hoş Geldiniz</h2>
+            <p class="subtitle">Biletlerinize erişmek için giriş yapın.</p>
+            
+            <div id="authAlert" class="form-alert"></div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">E-posta Adresi</label>
+                    <input type="email" id="email" class="form-control" placeholder="ornek@email.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Şifre</label>
+                    <input type="password" id="password" class="form-control" placeholder="••••••••" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Giriş Yap</button>
+            </form>
+
+            <div class="auth-links">
+                Hesabınız yok mu? <a href="register.html">Hemen Kayıt Olun</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+</body>
+</html>

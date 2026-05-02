@@ -22,7 +22,8 @@ public class CityController {
         try {
             return ResponseEntity.ok(cityService.addCity(city));
         } catch (RuntimeException e) {
-            // Eğer aynı isimde şehir varsa Service'in fırlattığı hatayı yakalayıp 400 Bad Request dönüyoruz.
+            // Eğer aynı isimde şehir varsa Service'in fırlattığı hatayı yakalayıp 400 Bad
+            // Request dönüyoruz.
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }

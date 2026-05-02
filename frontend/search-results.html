@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seferler | OtoBilet</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <nav>
+        <a href="index.html" class="logo">Oto<span>Bilet</span></a>
+        <div class="nav-links">
+            <a href="#" id="navProfile" style="display: none;">Profilim</a>
+            <a href="login.html" id="navLogin">Üye Girişi</a>
+            <a href="register.html" id="navRegister" class="btn btn-primary" style="padding: 0.4rem 1rem;">Üye Ol</a>
+            <a href="#" id="navLogout" style="display: none; color: var(--text-muted);">Çıkış Yap</a>
+        </div>
+    </nav>
+
+    <div class="container" style="max-width: 800px;">
+        <div style="background: var(--bg-white); padding: 1.5rem; border-radius: 8px; box-shadow: var(--shadow); margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center;">
+            <div style="font-size: 1.2rem; font-weight: 500;">
+                <span id="headerFrom">İstanbul</span> <span style="color: var(--text-muted); font-size: 1.5rem;">➞</span> <span id="headerTo">Ankara</span>
+            </div>
+            <div id="headerDate" style="color: var(--text-muted); font-weight: 500;">
+                02 Mayıs 2024
+            </div>
+        </div>
+
+        <div id="loading" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+            Seferler aranıyor...
+        </div>
+
+        <div id="noResults" style="text-align: center; padding: 2rem; color: var(--error); display: none;">
+            Bu kriterlere uygun sefer bulunamadı. Lütfen başka bir tarih veya güzergah deneyin.
+        </div>
+
+        <div class="ticket-list" id="resultsContainer">
+            <!-- Results will be injected here -->
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/search.js"></script>
+</body>
+</html>

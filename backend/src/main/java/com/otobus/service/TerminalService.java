@@ -25,15 +25,20 @@ public class TerminalService {
 
     // 3. KURAL: Otogar silinmek istendiğinde, ona bağlı sefer varsa silinemesin.
     public void deleteTerminal(Long id) {
-        // DİKKAT: Sefer (Trip) tablosunu Arda yazıyor. 
-        // Onun kodları henüz main dala (ana projeye) gelmediği için şu an o kontrolü yazamayız.
-        // O yüzden buraya takım çalışmasında çok kullanılan bir "TODO" (Yapılacak) notu bırakıyoruz.
-        // Arda kodlarını bitirip birleştirdiğimizde, buraya "TripRepository" çağırıp kontrol ekleyeceğiz.
-        
-        /* TODO: Arda Trip entity'sini bitirince buraya şu mantık eklenecek:
-         boolean hasTrips = tripRepository.existsByTerminalId(id);
-         if(hasTrips) throw new RuntimeException("Bu otogara ait seferler var, silinemez!");
-        */
+        // DİKKAT: Sefer (Trip) tablosunu Arda yazıyor.
+        // Onun kodları henüz main dala (ana projeye) gelmediği için şu an o kontrolü
+        // yazamayız.
+        // O yüzden buraya takım çalışmasında çok kullanılan bir "TODO" (Yapılacak) notu
+        // bırakıyoruz.
+        // Arda kodlarını bitirip birleştirdiğimizde, buraya "TripRepository" çağırıp
+        // kontrol ekleyeceğiz.
+
+        /*
+         * TODO: Arda Trip entity'sini bitirince buraya şu mantık eklenecek:
+         * boolean hasTrips = tripRepository.existsByTerminalId(id);
+         * if(hasTrips) throw new
+         * RuntimeException("Bu otogara ait seferler var, silinemez!");
+         */
 
         // Şimdilik sadece standart silme işlemini yapıyoruz.
         terminalRepository.deleteById(id);
