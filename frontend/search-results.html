@@ -4,45 +4,207 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Seferler | OtoBilet</title>
-    <link rel="stylesheet" href="css/style.css">
+    <meta name="description" content="Otobüs seferleri arama sonuçları. En uygun fiyatlı seferleri karşılaştırın.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { 50:'#fef2f2',100:'#fee2e2',200:'#fecaca',500:'#ef4444',600:'#dc2626',700:'#b91c1c',800:'#991b1b' },
+            navy: { 50:'#f0f4ff',100:'#e0e7ff',600:'#1e3a5f',700:'#172e4a',800:'#0f1f35',900:'#0a1628' }
+          },
+          fontFamily: { sans: ['Inter', 'sans-serif'] }
+        }
+      }
+    }
+    </script>
+    <style>
+      * { font-family: 'Inter', sans-serif; }
+      .trip-card { transition: all 0.3s ease; }
+      .trip-card:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(0,0,0,0.1); }
+      .seat-btn { transition: all 0.3s ease; }
+      .seat-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(220,38,38,0.35); }
+      .filter-chip { transition: all 0.2s ease; }
+      .filter-chip:hover { transform: translateY(-1px); }
+      .filter-chip.active { background: linear-gradient(135deg, #1e3a5f, #172e4a); color: white; border-color: #1e3a5f; }
+      @keyframes fadeInUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+      .animate-card { animation: fadeInUp 0.4s ease forwards; opacity: 0; }
+      @keyframes pulse-dot { 0%,100%{opacity:0.4} 50%{opacity:1} }
+      .loading-dot { animation: pulse-dot 1.2s ease-in-out infinite; }
+      .skeleton { background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+      /* Seat Panel */
+      .seat-panel { max-height: 0; opacity: 0; transform: translateY(-10px); transition: max-height 0.4s ease, opacity 0.3s ease, transform 0.3s ease; overflow: hidden; }
+      .seat-panel.seat-panel-open { max-height: 2000px; opacity: 1; transform: translateY(0); }
+      @keyframes popIn { from{opacity:0;transform:scale(0.85)} to{opacity:1;transform:scale(1)} }
+      .animate-popup { animation: popIn 0.2s ease forwards; }
+      .seat-box:active:not(:disabled) { transform: scale(0.9); }
+      @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+    </style>
 </head>
-<body>
+<body class="bg-gray-50 min-h-screen">
 
-    <nav>
-        <a href="index.html" class="logo">Oto<span>Bilet</span></a>
-        <div class="nav-links">
-            <a href="#" id="navProfile" style="display: none;">Profilim</a>
-            <a href="login.html" id="navLogin">Üye Girişi</a>
-            <a href="register.html" id="navRegister" class="btn btn-primary" style="padding: 0.4rem 1rem;">Üye Ol</a>
-            <a href="#" id="navLogout" style="display: none; color: var(--text-muted);">Çıkış Yap</a>
+    <!-- Navbar -->
+    <nav class="bg-white/95 backdrop-blur-md shadow-sm sticky top-0 z-50 border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a href="index.html" class="flex items-center gap-2 text-2xl font-extrabold tracking-tight">
+                    <div class="w-9 h-9 bg-gradient-to-br from-brand-600 to-brand-700 rounded-lg flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 7h8m-8 4h8m-4 4v3m-6-3h12a2 2 0 002-2V5a2 2 0 00-2-2H6a2 2 0 00-2 2v8a2 2 0 002 2zm-2 3h16"/></svg>
+                    </div>
+                    <span class="text-navy-800">Oto<span class="text-brand-600">Bilet</span></span>
+                </a>
+                <button id="mobileMenuBtn" class="md:hidden p-2 rounded-lg hover:bg-gray-100">
+                    <svg class="w-6 h-6 text-navy-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+                </button>
+                <div class="hidden md:flex items-center gap-3">
+                    <a href="#" id="navProfile" class="hidden text-sm font-medium text-navy-700 hover:text-brand-600 transition px-3 py-2 rounded-lg hover:bg-brand-50">Profilim</a>
+                    <a href="login.html" id="navLogin" class="text-sm font-medium text-navy-700 hover:text-brand-600 transition px-4 py-2 rounded-lg hover:bg-gray-100">Üye Girişi</a>
+                    <a href="register.html" id="navRegister" class="text-sm font-semibold text-white bg-gradient-to-r from-brand-600 to-brand-700 hover:from-brand-700 hover:to-brand-800 px-5 py-2.5 rounded-xl shadow-md hover:shadow-lg transition-all">Kayıt Ol</a>
+                    <a href="#" id="navLogout" class="hidden text-sm font-medium text-gray-500 hover:text-brand-600 transition px-3 py-2">Çıkış Yap</a>
+                </div>
+            </div>
+            <div id="mobileMenu" class="hidden md:hidden pb-4 border-t border-gray-100 mt-2 pt-3">
+                <div class="flex flex-col gap-2">
+                    <a href="login.html" class="text-sm font-medium text-navy-700 px-3 py-2 rounded-lg hover:bg-gray-100">Üye Girişi</a>
+                    <a href="register.html" class="text-sm font-semibold text-white bg-brand-600 px-4 py-2.5 rounded-xl text-center">Kayıt Ol</a>
+                </div>
+            </div>
         </div>
     </nav>
 
-    <div class="container" style="max-width: 800px;">
-        <div style="background: var(--bg-white); padding: 1.5rem; border-radius: 8px; box-shadow: var(--shadow); margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center;">
-            <div style="font-size: 1.2rem; font-weight: 500;">
-                <span id="headerFrom">İstanbul</span> <span style="color: var(--text-muted); font-size: 1.5rem;">➞</span> <span id="headerTo">Ankara</span>
+    <!-- Route Summary Header -->
+    <header class="bg-gradient-to-r from-navy-800 to-navy-900 text-white">
+        <div class="max-w-5xl mx-auto px-4 py-5 sm:py-6">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div class="flex items-center gap-3 text-lg sm:text-xl font-bold tracking-wide">
+                    <div class="flex items-center gap-2">
+                        <svg class="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2a10 10 0 0110 10c0 5.52-10 12-10 12S2 17.52 2 12A10 10 0 0112 2z"/></svg>
+                        <span id="headerFrom">İSTANBUL</span>
+                    </div>
+                    <span class="text-brand-500 text-2xl">➞</span>
+                    <div class="flex items-center gap-2">
+                        <svg class="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2a10 10 0 0110 10c0 5.52-10 12-10 12S2 17.52 2 12A10 10 0 0112 2z"/></svg>
+                        <span id="headerTo">ANKARA</span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-xl">
+                    <svg class="w-4 h-4 text-brand-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                    <span id="headerDate" class="text-sm font-semibold">02 Mayıs 2026</span>
+                </div>
             </div>
-            <div id="headerDate" style="color: var(--text-muted); font-weight: 500;">
-                02 Mayıs 2024
+            <!-- Back link -->
+            <a href="index.html" class="inline-flex items-center gap-1 text-xs text-gray-400 hover:text-white transition mt-3">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg>
+                Yeni arama yap
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-5xl mx-auto px-4 py-6 sm:py-8">
+        <div class="flex flex-col lg:flex-row gap-6">
+
+            <!-- Filter Sidebar -->
+            <aside class="lg:w-64 flex-shrink-0">
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sticky top-24">
+                    <h3 class="text-sm font-bold text-navy-800 uppercase tracking-wider mb-4 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-navy-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 4h18M7 8h10M10 12h4"/></svg>
+                        Sırala & Filtrele
+                    </h3>
+
+                    <!-- Sort Options -->
+                    <div class="mb-5">
+                        <label class="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-2 block">Sıralama</label>
+                        <div class="flex flex-col gap-2">
+                            <button data-sort="price-asc" class="filter-chip active text-left px-4 py-2.5 rounded-xl border-2 border-gray-200 text-sm font-medium cursor-pointer flex items-center gap-2">
+                                <span>💰</span> Fiyat: Düşükten Yükseğe
+                            </button>
+                            <button data-sort="price-desc" class="filter-chip text-left px-4 py-2.5 rounded-xl border-2 border-gray-200 text-sm font-medium text-navy-700 bg-white cursor-pointer flex items-center gap-2">
+                                <span>💎</span> Fiyat: Yüksekten Düşüğe
+                            </button>
+                            <button data-sort="time-asc" class="filter-chip text-left px-4 py-2.5 rounded-xl border-2 border-gray-200 text-sm font-medium text-navy-700 bg-white cursor-pointer flex items-center gap-2">
+                                <span>🕐</span> Saat: Erken Önce
+                            </button>
+                            <button data-sort="time-desc" class="filter-chip text-left px-4 py-2.5 rounded-xl border-2 border-gray-200 text-sm font-medium text-navy-700 bg-white cursor-pointer flex items-center gap-2">
+                                <span>🕘</span> Saat: Geç Önce
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Bus Type Filter -->
+                    <div>
+                        <label class="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-2 block">Otobüs Tipi</label>
+                        <div class="flex flex-col gap-2">
+                            <label class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-50 cursor-pointer transition">
+                                <input type="checkbox" value="all" checked class="bus-type-filter w-4 h-4 rounded text-brand-600 focus:ring-brand-500">
+                                <span class="text-sm text-navy-700 font-medium">Tümü</span>
+                            </label>
+                            <label class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-50 cursor-pointer transition">
+                                <input type="checkbox" value="2+1" class="bus-type-filter w-4 h-4 rounded text-brand-600 focus:ring-brand-500">
+                                <span class="text-sm text-navy-700 font-medium">2+1</span>
+                                <span class="text-xs text-gray-400 ml-auto">Konfor</span>
+                            </label>
+                            <label class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-50 cursor-pointer transition">
+                                <input type="checkbox" value="2+2" class="bus-type-filter w-4 h-4 rounded text-brand-600 focus:ring-brand-500">
+                                <span class="text-sm text-navy-700 font-medium">2+2</span>
+                                <span class="text-xs text-gray-400 ml-auto">Ekonomi</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Results Column -->
+            <div class="flex-1">
+                <!-- Results Count -->
+                <div id="resultsInfo" class="flex items-center justify-between mb-4">
+                    <p class="text-sm text-gray-500"><span id="tripCount" class="font-bold text-navy-800">0</span> sefer bulundu</p>
+                </div>
+
+                <!-- Loading State -->
+                <div id="loading" class="flex flex-col items-center justify-center py-16 gap-4">
+                    <div class="flex gap-2">
+                        <div class="w-3 h-3 bg-brand-500 rounded-full loading-dot"></div>
+                        <div class="w-3 h-3 bg-navy-600 rounded-full loading-dot" style="animation-delay:0.2s"></div>
+                        <div class="w-3 h-3 bg-brand-500 rounded-full loading-dot" style="animation-delay:0.4s"></div>
+                    </div>
+                    <p class="text-gray-500 font-medium">Seferler aranıyor...</p>
+                </div>
+
+                <!-- No Results State -->
+                <div id="noResults" class="hidden">
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-10 text-center">
+                        <div class="w-16 h-16 bg-brand-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-brand-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 9v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        </div>
+                        <h3 class="text-lg font-bold text-navy-800 mb-2">Sefer Bulunamadı</h3>
+                        <p class="text-gray-500 text-sm mb-4">Bu kriterlere uygun sefer bulunamadı. Farklı bir tarih veya güzergah deneyin.</p>
+                        <a href="index.html" class="inline-flex items-center gap-2 text-sm font-semibold text-brand-600 hover:text-brand-700 transition">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg>
+                            Ana Sayfaya Dön
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Results Container -->
+                <div id="resultsContainer" class="flex flex-col gap-4">
+                    <!-- Trip cards injected here by JS -->
+                </div>
             </div>
         </div>
+    </main>
 
-        <div id="loading" style="text-align: center; padding: 2rem; color: var(--text-muted);">
-            Seferler aranıyor...
-        </div>
-
-        <div id="noResults" style="text-align: center; padding: 2rem; color: var(--error); display: none;">
-            Bu kriterlere uygun sefer bulunamadı. Lütfen başka bir tarih veya güzergah deneyin.
-        </div>
-
-        <div class="ticket-list" id="resultsContainer">
-            <!-- Results will be injected here -->
-        </div>
-    </div>
+    <!-- Footer -->
+    <footer class="bg-navy-900 text-gray-400 text-center py-8 mt-12 text-sm">
+        <p>© 2026 OtoBilet — Tüm hakları saklıdır.</p>
+    </footer>
 
     <script src="js/api.js"></script>
     <script src="js/main.js"></script>
+    <script src="js/seat-selection.js"></script>
     <script src="js/search.js"></script>
 </body>
 </html>

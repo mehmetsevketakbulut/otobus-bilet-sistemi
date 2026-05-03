@@ -4,111 +4,288 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Otobüs Bileti Al | OtoBilet</title>
-    <link rel="stylesheet" href="css/style.css">
+    <meta name="description" content="Türkiye'nin en güvenilir otobüs bileti platformu. Hızlı, kolay ve uygun fiyatlı bilet alın.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { 50:'#fef2f2',100:'#fee2e2',200:'#fecaca',500:'#ef4444',600:'#dc2626',700:'#b91c1c',800:'#991b1b' },
+            navy: { 50:'#f0f4ff',100:'#e0e7ff',600:'#1e3a5f',700:'#172e4a',800:'#0f1f35',900:'#0a1628' }
+          },
+          fontFamily: { sans: ['Inter', 'sans-serif'] }
+        }
+      }
+    }
+    </script>
+    <style>
+      * { font-family: 'Inter', sans-serif; }
+      .hero-bg {
+        background: linear-gradient(135deg, #0a1628 0%, #1e3a5f 50%, #172e4a 100%);
+        position: relative; overflow: hidden;
+      }
+      .hero-bg::before {
+        content: ''; position: absolute; inset: 0;
+        background: radial-gradient(circle at 20% 80%, rgba(220,38,38,0.15) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 20%, rgba(30,58,95,0.3) 0%, transparent 50%);
+      }
+      .glass-card {
+        background: rgba(255,255,255,0.97); backdrop-filter: blur(20px);
+        border: 1px solid rgba(255,255,255,0.2);
+      }
+      .custom-select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%236b7280' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; }
+      .swap-btn { transition: all 0.3s cubic-bezier(0.4,0,0.2,1); }
+      .swap-btn:hover { transform: rotate(180deg) scale(1.1); }
+      .search-submit { transition: all 0.3s ease; }
+      .search-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(220,38,38,0.4); }
+      .date-chip { transition: all 0.2s ease; }
+      .date-chip:hover { transform: translateY(-1px); }
+      .float-dot { position:absolute; border-radius:50%; opacity:0.08; animation: float 6s ease-in-out infinite; }
+      @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-20px)} }
+      .route-card { transition: all 0.3s ease; }
+      .route-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(0,0,0,0.1); }
+      @keyframes fadeInUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+      .animate-in { animation: fadeInUp 0.6s ease forwards; }
+    </style>
 </head>
-<body>
+<body class="bg-gray-50 min-h-screen">
 
-    <nav>
-        <a href="index.html" class="logo">Oto<span>Bilet</span></a>
-        <div class="nav-links">
-            <a href="#" id="navProfile" style="display: none;">Profilim</a>
-            <a href="login.html" id="navLogin">Üye Girişi</a>
-            <a href="register.html" id="navRegister" class="btn btn-primary" style="padding: 0.4rem 1rem;">Üye Ol</a>
-            <a href="#" id="navLogout" style="display: none; color: var(--text-muted);">Çıkış Yap</a>
+    <!-- Navbar -->
+    <nav class="bg-white/95 backdrop-blur-md shadow-sm sticky top-0 z-50 border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a href="index.html" class="flex items-center gap-2 text-2xl font-extrabold tracking-tight" id="nav-logo">
+                    <div class="w-9 h-9 bg-gradient-to-br from-brand-600 to-brand-700 rounded-lg flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 7h8m-8 4h8m-4 4v3m-6-3h12a2 2 0 002-2V5a2 2 0 00-2-2H6a2 2 0 00-2 2v8a2 2 0 002 2zm-2 3h16"/></svg>
+                    </div>
+                    <span class="text-navy-800">Oto<span class="text-brand-600">Bilet</span></span>
+                </a>
+                <!-- Mobile Menu Button -->
+                <button id="mobileMenuBtn" class="md:hidden p-2 rounded-lg hover:bg-gray-100">
+                    <svg class="w-6 h-6 text-navy-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+                </button>
+                <div class="hidden md:flex items-center gap-3" id="navLinksDesktop">
+                    <a href="#" id="navProfile" class="hidden text-sm font-medium text-navy-700 hover:text-brand-600 transition px-3 py-2 rounded-lg hover:bg-brand-50">Profilim</a>
+                    <a href="login.html" id="navLogin" class="text-sm font-medium text-navy-700 hover:text-brand-600 transition px-4 py-2 rounded-lg hover:bg-gray-100">Üye Girişi</a>
+                    <a href="register.html" id="navRegister" class="text-sm font-semibold text-white bg-gradient-to-r from-brand-600 to-brand-700 hover:from-brand-700 hover:to-brand-800 px-5 py-2.5 rounded-xl shadow-md hover:shadow-lg transition-all">Kayıt Ol</a>
+                    <a href="#" id="navLogout" class="hidden text-sm font-medium text-gray-500 hover:text-brand-600 transition px-3 py-2">Çıkış Yap</a>
+                </div>
+            </div>
+            <!-- Mobile Menu -->
+            <div id="mobileMenu" class="hidden md:hidden pb-4 border-t border-gray-100 mt-2 pt-3">
+                <div class="flex flex-col gap-2">
+                    <a href="login.html" class="text-sm font-medium text-navy-700 px-3 py-2 rounded-lg hover:bg-gray-100">Üye Girişi</a>
+                    <a href="register.html" class="text-sm font-semibold text-white bg-brand-600 px-4 py-2.5 rounded-xl text-center">Kayıt Ol</a>
+                </div>
+            </div>
         </div>
     </nav>
 
-    <section class="hero">
-        <div class="container" style="padding: 0;">
-            <h1>Türkiye'nin Lider Otobüs Bileti Sitesi</h1>
-            
-            <form id="searchForm" action="search-results.html" class="search-box">
-                <div class="search-group">
-                    <label>Nereden</label>
-                    <input type="text" id="fromCity" class="search-control" placeholder="İl veya ilçe adı yazın" value="İstanbul" required>
-                </div>
-                
-                <div class="search-group" style="flex: 0.1; text-align: center; cursor: pointer;" id="swapBtn">
-                    <!-- Swap Icon Placeholder -->
-                    <span style="font-size: 1.5rem; color: var(--text-muted);">⇄</span>
+    <!-- Hero Section -->
+    <section class="hero-bg py-16 sm:py-24 px-4">
+        <!-- Floating decorative dots -->
+        <div class="float-dot w-32 h-32 bg-white top-10 left-[10%]" style="animation-delay:0s"></div>
+        <div class="float-dot w-20 h-20 bg-brand-500 top-20 right-[15%]" style="animation-delay:2s"></div>
+        <div class="float-dot w-16 h-16 bg-white bottom-10 left-[60%]" style="animation-delay:4s"></div>
+
+        <div class="max-w-4xl mx-auto relative z-10">
+            <div class="text-center mb-10 animate-in">
+                <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white mb-3 leading-tight">
+                    Türkiye'nin <span class="text-brand-500">Güvenilir</span> Bilet Platformu
+                </h1>
+                <p class="text-gray-300 text-base sm:text-lg font-light">En uygun fiyatlarla, güvenle seyahat edin.</p>
+            </div>
+
+            <!-- Search Form Card -->
+            <form id="searchForm" action="search-results.html" class="glass-card rounded-2xl sm:rounded-3xl shadow-2xl p-5 sm:p-8 animate-in" style="animation-delay:0.2s">
+                <!-- City Selection Row -->
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-end gap-3 sm:gap-0 mb-5">
+                    <!-- Nereden -->
+                    <div class="flex-1">
+                        <label for="fromCity" class="block text-xs font-semibold text-navy-600 uppercase tracking-wider mb-1.5">Nereden</label>
+                        <div class="relative">
+                            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-brand-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2a10 10 0 0110 10c0 5.52-10 12-10 12S2 17.52 2 12A10 10 0 0112 2z"/></svg>
+                            <select id="fromCity" required class="custom-select w-full pl-10 pr-8 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl text-navy-800 font-medium focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition">
+                                <option value="" disabled selected>İl seçin...</option>
+                            </select>
+                        </div>
+                    </div>
+                    <!-- Swap Button -->
+                    <div class="flex items-center justify-center sm:px-2 sm:pb-1">
+                        <button type="button" id="swapBtn" class="swap-btn w-11 h-11 rounded-full bg-navy-600 hover:bg-brand-600 flex items-center justify-center shadow-lg cursor-pointer">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M7 16V4m0 0L3 8m4-4l4 4m6 4v12m0 0l4-4m-4 4l-4-4"/></svg>
+                        </button>
+                    </div>
+                    <!-- Nereye -->
+                    <div class="flex-1">
+                        <label for="toCity" class="block text-xs font-semibold text-navy-600 uppercase tracking-wider mb-1.5">Nereye</label>
+                        <div class="relative">
+                            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-brand-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2a10 10 0 0110 10c0 5.52-10 12-10 12S2 17.52 2 12A10 10 0 0112 2z"/></svg>
+                            <select id="toCity" required class="custom-select w-full pl-10 pr-8 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl text-navy-800 font-medium focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition">
+                                <option value="" disabled selected>İl seçin...</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="search-group">
-                    <label>Nereye</label>
-                    <input type="text" id="toCity" class="search-control" placeholder="İl veya ilçe adı yazın" value="Ankara" required>
-                </div>
-                
-                <div class="search-group">
-                    <div class="date-controls">
-                        <button type="button" class="date-btn" id="btnToday">Bugün</button>
-                        <button type="button" class="date-btn active" id="btnTomorrow">Yarın</button>
+                <!-- Date Row -->
+                <div class="mb-5">
+                    <label for="tripDate" class="block text-xs font-semibold text-navy-600 uppercase tracking-wider mb-1.5">Gidiş Tarihi</label>
+                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                        <div class="relative flex-1">
+                            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-navy-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                            <input type="date" id="tripDate" required class="w-full pl-10 pr-4 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl text-navy-800 font-medium focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none transition">
+                        </div>
+                        <div class="flex gap-2">
+                            <button type="button" id="btnToday" class="date-chip flex-1 sm:flex-none px-5 py-3 rounded-xl border-2 border-gray-200 bg-white text-sm font-semibold text-navy-700 hover:border-brand-500 hover:text-brand-600 hover:bg-brand-50 transition cursor-pointer">
+                                📅 Bugün
+                            </button>
+                            <button type="button" id="btnTomorrow" class="date-chip flex-1 sm:flex-none px-5 py-3 rounded-xl border-2 border-brand-500 bg-brand-50 text-sm font-semibold text-brand-600 transition cursor-pointer">
+                                🗓️ Yarın
+                            </button>
+                        </div>
                     </div>
-                    <input type="date" id="tripDate" class="search-control" required>
                 </div>
-                
-                <button type="submit" class="search-btn">Otobüs Bileti Bul</button>
+
+                <!-- Submit Button -->
+                <button type="submit" id="searchSubmitBtn" class="search-submit w-full py-4 bg-gradient-to-r from-brand-600 to-brand-700 hover:from-brand-700 hover:to-brand-800 text-white text-lg font-bold rounded-2xl shadow-xl cursor-pointer flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                    Otobüs Bileti Bul
+                </button>
             </form>
         </div>
     </section>
 
-    <div class="container">
-        <h2 style="margin-bottom: 1rem; text-align: center; color: var(--text-muted);">Popüler Güzergahlar</h2>
-        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-            <div class="ticket-card" style="width: 300px; cursor: pointer; display: block; text-align: center;">
-                <h3 style="color: var(--primary);">İstanbul - Ankara</h3>
-                <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem;">En ucuz 400 TL</p>
+    <!-- Popular Routes -->
+    <section class="max-w-6xl mx-auto px-4 py-14">
+        <h2 class="text-2xl font-bold text-navy-800 text-center mb-2">Popüler Güzergahlar</h2>
+        <p class="text-gray-500 text-center mb-8 text-sm">En çok tercih edilen hatlarımız</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div class="route-card bg-white rounded-2xl p-6 border border-gray-100 shadow-sm cursor-pointer group">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-xs font-bold text-white bg-brand-600 px-3 py-1 rounded-full">Popüler</span>
+                    <span class="text-xs text-gray-400">~6 saat</span>
+                </div>
+                <h3 class="text-lg font-bold text-navy-800 group-hover:text-brand-600 transition">İstanbul → Ankara</h3>
+                <p class="text-brand-600 font-extrabold text-xl mt-2">400 TL'den <span class="text-sm font-normal text-gray-400">itibaren</span></p>
             </div>
-            <div class="ticket-card" style="width: 300px; cursor: pointer; display: block; text-align: center;">
-                <h3 style="color: var(--primary);">İstanbul - İzmir</h3>
-                <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem;">En ucuz 550 TL</p>
+            <div class="route-card bg-white rounded-2xl p-6 border border-gray-100 shadow-sm cursor-pointer group">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-xs font-bold text-white bg-navy-600 px-3 py-1 rounded-full">Favori</span>
+                    <span class="text-xs text-gray-400">~9 saat</span>
+                </div>
+                <h3 class="text-lg font-bold text-navy-800 group-hover:text-brand-600 transition">İstanbul → İzmir</h3>
+                <p class="text-brand-600 font-extrabold text-xl mt-2">550 TL'den <span class="text-sm font-normal text-gray-400">itibaren</span></p>
             </div>
-            <div class="ticket-card" style="width: 300px; cursor: pointer; display: block; text-align: center;">
-                <h3 style="color: var(--primary);">Ankara - İzmir</h3>
-                <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem;">En ucuz 450 TL</p>
+            <div class="route-card bg-white rounded-2xl p-6 border border-gray-100 shadow-sm cursor-pointer group">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-xs font-bold text-white bg-brand-600 px-3 py-1 rounded-full">Popüler</span>
+                    <span class="text-xs text-gray-400">~8 saat</span>
+                </div>
+                <h3 class="text-lg font-bold text-navy-800 group-hover:text-brand-600 transition">Ankara → İzmir</h3>
+                <p class="text-brand-600 font-extrabold text-xl mt-2">450 TL'den <span class="text-sm font-normal text-gray-400">itibaren</span></p>
             </div>
         </div>
-    </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-navy-900 text-gray-400 text-center py-8 mt-8 text-sm">
+        <p>© 2026 OtoBilet — Tüm hakları saklıdır.</p>
+    </footer>
 
     <script src="js/api.js"></script>
     <script src="js/main.js"></script>
     <script>
-        // Set dates
+    (function() {
+        // --- DATE SETUP ---
         const today = new Date();
         const tomorrow = new Date(today);
         tomorrow.setDate(tomorrow.getDate() + 1);
-
         const dateInput = document.getElementById('tripDate');
-        dateInput.value = tomorrow.toISOString().split('T')[0]; // Default to tomorrow like obilet
+        const todayStr = today.toISOString().split('T')[0];
+        const tomorrowStr = tomorrow.toISOString().split('T')[0];
+        dateInput.setAttribute('min', todayStr);
+        dateInput.value = tomorrowStr;
 
-        document.getElementById('btnToday').addEventListener('click', function() {
-            dateInput.value = today.toISOString().split('T')[0];
-            this.classList.add('active');
-            document.getElementById('btnTomorrow').classList.remove('active');
+        const btnToday = document.getElementById('btnToday');
+        const btnTomorrow = document.getElementById('btnTomorrow');
+
+        function setActive(btn) {
+            [btnToday, btnTomorrow].forEach(b => {
+                b.className = b.className.replace(/border-brand-500 bg-brand-50 text-brand-600/g, 'border-gray-200 bg-white text-navy-700');
+            });
+            btn.className = btn.className.replace(/border-gray-200 bg-white text-navy-700/g, 'border-brand-500 bg-brand-50 text-brand-600');
+        }
+
+        btnToday.addEventListener('click', () => { dateInput.value = todayStr; setActive(btnToday); });
+        btnTomorrow.addEventListener('click', () => { dateInput.value = tomorrowStr; setActive(btnTomorrow); });
+
+        dateInput.addEventListener('change', () => {
+            const val = dateInput.value;
+            if (val === todayStr) setActive(btnToday);
+            else if (val === tomorrowStr) setActive(btnTomorrow);
+            else { [btnToday, btnTomorrow].forEach(b => { b.className = b.className.replace(/border-brand-500 bg-brand-50 text-brand-600/g, 'border-gray-200 bg-white text-navy-700'); }); }
         });
 
-        document.getElementById('btnTomorrow').addEventListener('click', function() {
-            dateInput.value = tomorrow.toISOString().split('T')[0];
-            this.classList.add('active');
-            document.getElementById('btnToday').classList.remove('active');
-        });
+        // --- DYNAMIC CITIES FROM API ---
+        async function loadCities() {
+            const fromSelect = document.getElementById('fromCity');
+            const toSelect = document.getElementById('toCity');
+            try {
+                const response = await fetch('/api/cities');
+                if (!response.ok) throw new Error('Şehirler yüklenemedi');
+                const cities = await response.json(); // expects [{id:1, name:"İstanbul"}, ...]
+                cities.forEach(city => {
+                    fromSelect.add(new Option(city.name, city.id));
+                    toSelect.add(new Option(city.name, city.id));
+                });
+            } catch (error) {
+                console.warn('API erişilemedi, yedek şehirler yükleniyor:', error);
+                const fallback = [
+                    {id:1,name:"İstanbul"},{id:2,name:"Ankara"},{id:3,name:"İzmir"},
+                    {id:4,name:"Bursa"},{id:5,name:"Antalya"},{id:6,name:"Trabzon"},
+                    {id:7,name:"Adana"},{id:8,name:"Konya"},{id:9,name:"Gaziantep"},
+                    {id:10,name:"Samsun"},{id:11,name:"Kayseri"},{id:12,name:"Eskişehir"},
+                    {id:13,name:"Diyarbakır"},{id:14,name:"Sivas"},{id:15,name:"Mersin"}
+                ];
+                fallback.forEach(city => {
+                    fromSelect.add(new Option(city.name, city.id));
+                    toSelect.add(new Option(city.name, city.id));
+                });
+            }
+        }
+        document.addEventListener('DOMContentLoaded', loadCities);
 
-        // Swap cities
+        // --- SWAP BUTTON ---
         document.getElementById('swapBtn').addEventListener('click', () => {
             const from = document.getElementById('fromCity');
             const to = document.getElementById('toCity');
-            const temp = from.value;
-            from.value = to.value;
-            to.value = temp;
+            [from.value, to.value] = [to.value, from.value];
         });
 
-        // Search Form Submission
+        // --- FORM SUBMIT ---
         document.getElementById('searchForm').addEventListener('submit', (e) => {
             e.preventDefault();
-            const from = document.getElementById('fromCity').value;
-            const to = document.getElementById('toCity').value;
+            const from = document.getElementById('fromCity');
+            const to = document.getElementById('toCity');
             const date = document.getElementById('tripDate').value;
-            window.location.href = `search-results.html?from=${from}&to=${to}&date=${date}`;
+            if (from.value === to.value && from.value !== '') {
+                alert('Kalkış ve varış noktası aynı olamaz!');
+                return;
+            }
+            const fromName = from.options[from.selectedIndex].text;
+            const toName = to.options[to.selectedIndex].text;
+            window.location.href = `search-results.html?from=${fromName}&to=${toName}&date=${date}`;
         });
+
+        // --- MOBILE MENU ---
+        document.getElementById('mobileMenuBtn').addEventListener('click', () => {
+            document.getElementById('mobileMenu').classList.toggle('hidden');
+        });
+    })();
     </script>
 </body>
 </html>

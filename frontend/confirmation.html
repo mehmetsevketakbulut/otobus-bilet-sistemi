@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bilet Onayı | OtoBilet</title>
+    <meta name="description" content="Biletiniz başarıyla oluşturuldu. Biniş kartınızı görüntüleyin.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { 50:'#fef2f2',100:'#fee2e2',200:'#fecaca',500:'#ef4444',600:'#dc2626',700:'#b91c1c',800:'#991b1b' },
+            navy: { 50:'#f0f4ff',100:'#e0e7ff',600:'#1e3a5f',700:'#172e4a',800:'#0f1f35',900:'#0a1628' }
+          },
+          fontFamily: { sans: ['Inter', 'sans-serif'] }
+        }
+      }
+    }
+    </script>
+    <style>
+      * { font-family: 'Inter', sans-serif; }
+
+      /* Success checkmark animation */
+      @keyframes checkDraw {
+        0% { stroke-dashoffset: 60; }
+        100% { stroke-dashoffset: 0; }
+      }
+      @keyframes circleDraw {
+        0% { stroke-dashoffset: 300; }
+        100% { stroke-dashoffset: 0; }
+      }
+      @keyframes scaleIn {
+        0% { transform: scale(0.5); opacity: 0; }
+        60% { transform: scale(1.1); }
+        100% { transform: scale(1); opacity: 1; }
+      }
+      @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      @keyframes confettiFall {
+        0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+        100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+      }
+      .success-icon { animation: scaleIn 0.6s ease forwards; }
+      .success-icon .circle { stroke-dasharray: 300; animation: circleDraw 0.8s ease forwards; }
+      .success-icon .check { stroke-dasharray: 60; animation: checkDraw 0.4s 0.5s ease forwards; stroke-dashoffset: 60; }
+      .animate-in { animation: fadeInUp 0.6s ease forwards; opacity: 0; }
+
+      /* Boarding Pass */
+      .boarding-pass {
+        position: relative;
+        background: white;
+        border-radius: 1.25rem;
+        overflow: hidden;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.06);
+      }
+      .boarding-pass::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 6px;
+        background: linear-gradient(90deg, #dc2626, #1e3a5f, #dc2626);
+      }
+      /* Tear-off perforation */
+      .perforation {
+        position: relative;
+        display: flex;
+        align-items: center;
+      }
+      .perforation::before {
+        content: '';
+        position: absolute;
+        top: 0; bottom: 0;
+        left: 0;
+        width: 1px;
+        background: repeating-linear-gradient(to bottom, #e5e7eb 0px, #e5e7eb 6px, transparent 6px, transparent 12px);
+      }
+      /* Notch circles for tear effect */
+      .notch-top, .notch-bottom {
+        position: absolute;
+        width: 24px; height: 24px;
+        border-radius: 50%;
+        background: #f9fafb;
+        z-index: 5;
+      }
+      .notch-top { top: -12px; }
+      .notch-bottom { bottom: -12px; }
+
+      /* QR code canvas */
+      .qr-fake {
+        image-rendering: pixelated;
+      }
+
+      /* Confetti */
+      .confetti {
+        position: fixed;
+        width: 10px; height: 10px;
+        top: -20px;
+        z-index: 0;
+        pointer-events: none;
+        animation: confettiFall linear forwards;
+      }
+
+      .action-btn { transition: all 0.3s ease; }
+      .action-btn:hover { transform: translateY(-2px); }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+    <!-- Confetti container -->
+    <div id="confettiContainer"></div>
+
+    <!-- Navbar -->
+    <nav class="bg-white/95 backdrop-blur-md shadow-sm sticky top-0 z-50 border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a href="index.html" class="flex items-center gap-2 text-2xl font-extrabold tracking-tight">
+                    <div class="w-9 h-9 bg-gradient-to-br from-brand-600 to-brand-700 rounded-lg flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 7h8m-8 4h8m-4 4v3m-6-3h12a2 2 0 002-2V5a2 2 0 00-2-2H6a2 2 0 00-2 2v8a2 2 0 002 2zm-2 3h16"/></svg>
+                    </div>
+                    <span class="text-navy-800">Oto<span class="text-brand-600">Bilet</span></span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-3xl mx-auto px-4 py-10 sm:py-16 relative z-10">
+
+        <!-- Success Icon & Message -->
+        <div class="text-center mb-10">
+            <div class="success-icon inline-flex items-center justify-center w-24 h-24 mb-5">
+                <svg viewBox="0 0 100 100" class="w-24 h-24">
+                    <circle class="circle" cx="50" cy="50" r="45" fill="none" stroke="#10b981" stroke-width="4"/>
+                    <path class="check" d="M30 52 L44 66 L72 38" fill="none" stroke="#10b981" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-navy-800 mb-2 animate-in" style="animation-delay:0.3s">
+                Biletiniz Başarıyla Oluşturuldu!
+            </h1>
+            <p class="text-gray-500 animate-in" style="animation-delay:0.4s">
+                Biniş kartınız aşağıda yer almaktadır. E-posta adresinize de gönderildi.
+            </p>
+        </div>
+
+        <!-- Boarding Pass(es) — generated by JS -->
+        <div id="boardingPasses" class="space-y-6 mb-10">
+            <!-- JS injects boarding passes here -->
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-col sm:flex-row gap-3 justify-center animate-in" style="animation-delay:0.8s">
+            <a href="index.html" class="action-btn flex items-center justify-center gap-2 px-8 py-3.5 bg-gradient-to-r from-brand-600 to-brand-700 hover:from-brand-700 hover:to-brand-800 text-white font-bold rounded-xl shadow-lg text-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1"/></svg>
+                Ana Sayfaya Dön
+            </a>
+            <button onclick="window.print()" class="action-btn flex items-center justify-center gap-2 px-8 py-3.5 bg-white border-2 border-gray-200 hover:border-navy-600 text-navy-800 font-bold rounded-xl shadow-sm text-sm cursor-pointer">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                Bileti Yazdır
+            </button>
+        </div>
+    </main>
+
+    <footer class="bg-navy-900 text-gray-400 text-center py-8 mt-12 text-sm">
+        <p>© 2026 OtoBilet — Tüm hakları saklıdır.</p>
+    </footer>
+
+    <script>
+    (function() {
+        // ── Read confirmation data ──
+        const raw = sessionStorage.getItem('obilet_confirmation');
+        if (!raw) {
+            // Demo fallback so the page is still viewable
+            var demoData = {
+                pnr: 'OB-A3K9F2',
+                from: 'İstanbul', to: 'Ankara',
+                date: '2026-05-04', time: '22:00',
+                companyName: 'Niğde Lüks',
+                passengers: [
+                    { seatNo: 6, gender: 'male', firstName: 'Ahmet', lastName: 'Yılmaz', tcNo: '12345678901' },
+                    { seatNo: 7, gender: 'female', firstName: 'Ayşe', lastName: 'Demir', tcNo: '98765432109' }
+                ],
+                totalAmount: 719.80
+            };
+            renderPasses(demoData);
+            spawnConfetti();
+            return;
+        }
+
+        const data = JSON.parse(raw);
+        renderPasses(data);
+        spawnConfetti();
+        sessionStorage.removeItem('obilet_confirmation');
+
+        // ── Render Boarding Passes ──
+        function renderPasses(data) {
+            const container = document.getElementById('boardingPasses');
+            const dateObj = data.date ? new Date(data.date) : new Date();
+            const dateStr = dateObj.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
+            const dayStr = dateObj.toLocaleDateString('tr-TR', { weekday: 'long' });
+
+            (data.passengers || []).forEach((p, idx) => {
+                const genderIcon = p.gender === 'male' ? '👨' : '👩';
+                const fullName = `${(p.firstName || 'Yolcu').toUpperCase()} ${(p.lastName || '').toUpperCase()}`;
+                const qrId = `qr-${idx}`;
+
+                const pass = document.createElement('div');
+                pass.className = 'boarding-pass animate-in';
+                pass.style.animationDelay = `${0.5 + idx * 0.15}s`;
+
+                pass.innerHTML = `
+                    <!-- Header -->
+                    <div class="bg-gradient-to-r from-navy-800 to-navy-900 px-6 py-4 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <div class="w-7 h-7 bg-white/10 rounded-lg flex items-center justify-center">
+                                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 7h8m-8 4h8m-4 4v3m-6-3h12a2 2 0 002-2V5a2 2 0 00-2-2H6a2 2 0 00-2 2v8a2 2 0 002 2zm-2 3h16"/></svg>
+                            </div>
+                            <span class="text-white font-bold text-sm">OtoBilet</span>
+                        </div>
+                        <span class="text-white/60 text-xs font-medium">BİNİŞ KARTI</span>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row">
+                        <!-- Left: Info -->
+                        <div class="flex-1 p-6 space-y-5">
+                            <!-- Passenger Name -->
+                            <div>
+                                <p class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold mb-1">Yolcu</p>
+                                <p class="text-lg font-extrabold text-navy-800 flex items-center gap-2">
+                                    ${genderIcon} ${fullName}
+                                </p>
+                            </div>
+
+                            <!-- Route -->
+                            <div class="flex items-center gap-4">
+                                <div class="text-center">
+                                    <p class="text-2xl font-extrabold text-navy-800">${(data.from || '-').substring(0,3).toUpperCase()}</p>
+                                    <p class="text-[10px] text-gray-400 font-medium mt-0.5">${data.from || '-'}</p>
+                                </div>
+                                <div class="flex-1 flex flex-col items-center gap-1">
+                                    <div class="flex items-center gap-1 w-full">
+                                        <div class="w-2.5 h-2.5 rounded-full bg-navy-600 border-2 border-navy-200"></div>
+                                        <div class="flex-1 h-0.5 bg-gradient-to-r from-navy-600 to-brand-500 relative">
+                                            <svg class="absolute -top-2.5 left-1/2 -translate-x-1/2 w-5 h-5 text-brand-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"/></svg>
+                                        </div>
+                                        <div class="w-2.5 h-2.5 rounded-full bg-brand-500 border-2 border-brand-200"></div>
+                                    </div>
+                                    <span class="text-[10px] text-gray-400">${data.companyName || ''}</span>
+                                </div>
+                                <div class="text-center">
+                                    <p class="text-2xl font-extrabold text-navy-800">${(data.to || '-').substring(0,3).toUpperCase()}</p>
+                                    <p class="text-[10px] text-gray-400 font-medium mt-0.5">${data.to || '-'}</p>
+                                </div>
+                            </div>
+
+                            <!-- Details Grid -->
+                            <div class="grid grid-cols-3 gap-3">
+                                <div class="bg-gray-50 rounded-xl p-3">
+                                    <p class="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Tarih</p>
+                                    <p class="text-sm font-bold text-navy-800 mt-0.5">${dateStr}</p>
+                                    <p class="text-[10px] text-gray-400">${dayStr}</p>
+                                </div>
+                                <div class="bg-gray-50 rounded-xl p-3">
+                                    <p class="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Saat</p>
+                                    <p class="text-sm font-bold text-navy-800 mt-0.5">${data.time || '-'}</p>
+                                    <p class="text-[10px] text-gray-400">Kalkış</p>
+                                </div>
+                                <div class="bg-gray-50 rounded-xl p-3">
+                                    <p class="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Koltuk</p>
+                                    <p class="text-sm font-bold text-navy-800 mt-0.5">No. ${p.seatNo}</p>
+                                    <p class="text-[10px] text-gray-400">${p.gender === 'male' ? 'Erkek' : 'Kadın'}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Perforation + Right: PNR & QR -->
+                        <div class="perforation sm:w-52 border-t sm:border-t-0 p-6 flex flex-col items-center justify-center gap-4 relative">
+                            <div class="notch-top sm:block hidden" style="left:-12px"></div>
+                            <div class="notch-bottom sm:block hidden" style="left:-12px"></div>
+
+                            <div class="text-center">
+                                <p class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold mb-1">PNR Kodu</p>
+                                <p class="text-2xl font-extrabold text-brand-600 tracking-wider font-mono">${data.pnr || 'OB-XXXX'}</p>
+                            </div>
+
+                            <canvas id="${qrId}" class="qr-fake rounded-lg" width="100" height="100" style="width:100px; height:100px;"></canvas>
+
+                            <p class="text-[10px] text-gray-400 text-center">QR kodu okutarak<br>biniş yapabilirsiniz</p>
+                        </div>
+                    </div>
+                `;
+
+                container.appendChild(pass);
+
+                // Draw fake QR code
+                setTimeout(() => drawFakeQR(qrId, data.pnr + '-' + p.seatNo), 100);
+            });
+        }
+
+        // ── Fake QR Code Generator ──
+        function drawFakeQR(canvasId, seed) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const size = 100;
+            const cellSize = 4;
+            const gridCount = Math.floor(size / cellSize);
+
+            // Seed-based pseudo-random
+            let hash = 0;
+            for (let i = 0; i < seed.length; i++) {
+                hash = ((hash << 5) - hash) + seed.charCodeAt(i);
+                hash |= 0;
+            }
+            function seededRandom() {
+                hash = (hash * 1103515245 + 12345) & 0x7fffffff;
+                return (hash % 100) / 100;
+            }
+
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, size, size);
+
+            ctx.fillStyle = '#0f1f35';
+
+            // QR positioning squares (3 corners)
+            function drawFinder(x, y) {
+                ctx.fillRect(x, y, 7 * cellSize, 7 * cellSize);
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(x + cellSize, y + cellSize, 5 * cellSize, 5 * cellSize);
+                ctx.fillStyle = '#0f1f35';
+                ctx.fillRect(x + 2 * cellSize, y + 2 * cellSize, 3 * cellSize, 3 * cellSize);
+            }
+            drawFinder(0, 0);
+            drawFinder(size - 7 * cellSize, 0);
+            drawFinder(0, size - 7 * cellSize);
+
+            // Random data dots
+            for (let row = 0; row < gridCount; row++) {
+                for (let col = 0; col < gridCount; col++) {
+                    // Skip finder pattern areas
+                    if ((row < 8 && col < 8) || (row < 8 && col >= gridCount - 8) || (row >= gridCount - 8 && col < 8)) continue;
+                    if (seededRandom() > 0.55) {
+                        ctx.fillStyle = '#0f1f35';
+                        ctx.fillRect(col * cellSize, row * cellSize, cellSize, cellSize);
+                    }
+                }
+            }
+        }
+
+        // ── Confetti ──
+        function spawnConfetti() {
+            const container = document.getElementById('confettiContainer');
+            const colors = ['#dc2626', '#1e3a5f', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'];
+            for (let i = 0; i < 50; i++) {
+                const c = document.createElement('div');
+                c.className = 'confetti';
+                c.style.left = Math.random() * 100 + 'vw';
+                c.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                c.style.width = (Math.random() * 8 + 4) + 'px';
+                c.style.height = (Math.random() * 8 + 4) + 'px';
+                c.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+                c.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                c.style.animationDelay = (Math.random() * 1.5) + 's';
+                container.appendChild(c);
+            }
+            setTimeout(() => container.innerHTML = '', 5000);
+        }
+    })();
+    </script>
+</body>
+</html>

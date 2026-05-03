@@ -3,47 +3,371 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Giriş Yap | Otobüs Bilet Sistemi</title>
-    <link rel="stylesheet" href="css/style.css">
+    <title>Giriş Yap | OtoBilet</title>
+    <meta name="description" content="OtoBilet hesabınıza giriş yapın veya yeni hesap oluşturun.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { 50:'#fef2f2',100:'#fee2e2',200:'#fecaca',500:'#ef4444',600:'#dc2626',700:'#b91c1c',800:'#991b1b' },
+            navy: { 50:'#f0f4ff',100:'#e0e7ff',600:'#1e3a5f',700:'#172e4a',800:'#0f1f35',900:'#0a1628' }
+          },
+          fontFamily: { sans: ['Inter', 'sans-serif'] }
+        }
+      }
+    }
+    </script>
+    <style>
+      * { font-family: 'Inter', sans-serif; }
+      .input-field { transition: border-color 0.2s, box-shadow 0.2s; }
+      .input-field:focus { border-color: #1e3a5f; box-shadow: 0 0 0 3px rgba(30,58,95,0.1); }
+      .input-field.error { border-color: #dc2626; box-shadow: 0 0 0 3px rgba(220,38,38,0.1); }
+      .auth-btn { transition: all 0.3s ease; }
+      .auth-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(30,58,95,0.3); }
+      .auth-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+      .tab-btn { transition: all 0.2s ease; position: relative; }
+      .tab-btn::after { content:''; position: absolute; bottom: -2px; left: 0; right: 0; height: 3px; border-radius: 2px; background: transparent; transition: background 0.3s; }
+      .tab-btn.active { color: #1e3a5f; }
+      .tab-btn.active::after { background: #dc2626; }
+      @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+      .form-animate { animation: fadeIn 0.35s ease forwards; }
+      @keyframes slideUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+      .alert-animate { animation: slideUp 0.3s ease forwards; }
+      .hero-overlay { background: linear-gradient(to top, rgba(10,22,40,0.85) 0%, rgba(10,22,40,0.3) 50%, rgba(10,22,40,0.5) 100%); }
+      .pw-toggle { transition: color 0.2s; }
+      .pw-toggle:hover { color: #1e3a5f; }
+    </style>
 </head>
-<body>
+<body class="bg-gray-50 min-h-screen">
 
-    <nav>
-        <a href="index.html" class="logo">Oto<span>Bilet</span></a>
-        <div class="nav-links">
-            <a href="index.html">Ana Sayfa</a>
-            <a href="register.html">Kayıt Ol</a>
+    <div class="flex min-h-screen">
+        <!-- LEFT: Hero Image Panel -->
+        <div class="hidden lg:flex lg:w-1/2 relative overflow-hidden">
+            <img src="img/travel-hero.png" alt="Seyahat" class="absolute inset-0 w-full h-full object-cover">
+            <div class="hero-overlay absolute inset-0"></div>
+            <div class="relative z-10 flex flex-col justify-end p-12 pb-16">
+                <a href="index.html" class="flex items-center gap-2 text-2xl font-extrabold mb-8">
+                    <div class="w-9 h-9 bg-white/20 backdrop-blur-md rounded-lg flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 7h8m-8 4h8m-4 4v3m-6-3h12a2 2 0 002-2V5a2 2 0 00-2-2H6a2 2 0 00-2 2v8a2 2 0 002 2zm-2 3h16"/></svg>
+                    </div>
+                    <span class="text-white">Oto<span class="text-brand-500">Bilet</span></span>
+                </a>
+                <h2 class="text-3xl font-extrabold text-white leading-tight mb-3">
+                    Yolculuğunuz<br>burada başlıyor
+                </h2>
+                <p class="text-gray-300 text-sm leading-relaxed max-w-md">
+                    Türkiye'nin dört bir yanına uygun fiyatlı otobüs biletleri. Hesabınıza giriş yaparak biletlerinizi yönetin.
+                </p>
+                <!-- Stats -->
+                <div class="flex gap-6 mt-8">
+                    <div>
+                        <p class="text-2xl font-extrabold text-white">500+</p>
+                        <p class="text-xs text-gray-400">Otobüs Firması</p>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-extrabold text-white">81</p>
+                        <p class="text-xs text-gray-400">İl</p>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-extrabold text-white">10M+</p>
+                        <p class="text-xs text-gray-400">Mutlu Yolcu</p>
+                    </div>
+                </div>
+            </div>
         </div>
-    </nav>
 
-    <div class="container auth-container">
-        <div class="glass-card">
-            <h2>Hoş Geldiniz</h2>
-            <p class="subtitle">Biletlerinize erişmek için giriş yapın.</p>
-            
-            <div id="authAlert" class="form-alert"></div>
-
-            <form id="loginForm">
-                <div class="form-group">
-                    <label for="email">E-posta Adresi</label>
-                    <input type="email" id="email" class="form-control" placeholder="ornek@email.com" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="password">Şifre</label>
-                    <input type="password" id="password" class="form-control" placeholder="••••••••" required>
+        <!-- RIGHT: Auth Form -->
+        <div class="flex-1 flex items-center justify-center px-6 py-10 lg:px-16">
+            <div class="w-full max-w-md">
+                <!-- Mobile logo -->
+                <div class="lg:hidden mb-8 text-center">
+                    <a href="index.html" class="inline-flex items-center gap-2 text-2xl font-extrabold">
+                        <div class="w-9 h-9 bg-gradient-to-br from-brand-600 to-brand-700 rounded-lg flex items-center justify-center">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 7h8m-8 4h8m-4 4v3m-6-3h12a2 2 0 002-2V5a2 2 0 00-2-2H6a2 2 0 00-2 2v8a2 2 0 002 2zm-2 3h16"/></svg>
+                        </div>
+                        <span class="text-navy-800">Oto<span class="text-brand-600">Bilet</span></span>
+                    </a>
                 </div>
 
-                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Giriş Yap</button>
-            </form>
+                <!-- Tabs -->
+                <div class="flex border-b-2 border-gray-200 mb-8">
+                    <button id="tabLogin" class="tab-btn active flex-1 pb-3 text-sm font-bold uppercase tracking-wider cursor-pointer text-navy-800">
+                        Giriş Yap
+                    </button>
+                    <button id="tabRegister" class="tab-btn flex-1 pb-3 text-sm font-bold uppercase tracking-wider cursor-pointer text-gray-400">
+                        Kayıt Ol
+                    </button>
+                </div>
 
-            <div class="auth-links">
-                Hesabınız yok mu? <a href="register.html">Hemen Kayıt Olun</a>
+                <!-- Alert Box -->
+                <div id="authAlert" class="hidden mb-4 px-4 py-3 rounded-xl text-sm font-medium"></div>
+
+                <!-- ═══ LOGIN FORM ═══ -->
+                <form id="loginForm" class="form-animate space-y-5">
+                    <div>
+                        <h2 class="text-2xl font-extrabold text-navy-800 mb-1">Hoş Geldiniz 👋</h2>
+                        <p class="text-sm text-gray-500">Hesabınıza giriş yaparak devam edin</p>
+                    </div>
+
+                    <div>
+                        <label for="loginEmail" class="block text-xs font-semibold text-gray-600 mb-1.5">E-posta Adresi</label>
+                        <div class="relative">
+                            <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                            <input type="email" id="loginEmail" required placeholder="ornek@email.com"
+                                class="input-field w-full pl-11 pr-4 py-3.5 border-2 border-gray-200 rounded-xl text-sm text-navy-800 outline-none bg-gray-50/50">
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between items-center mb-1.5">
+                            <label for="loginPassword" class="text-xs font-semibold text-gray-600">Şifre</label>
+                            <a href="#" class="text-xs font-medium text-brand-600 hover:text-brand-700 transition">Şifremi Unuttum</a>
+                        </div>
+                        <div class="relative">
+                            <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"/></svg>
+                            <input type="password" id="loginPassword" required placeholder="••••••••" minlength="6"
+                                class="input-field w-full pl-11 pr-11 py-3.5 border-2 border-gray-200 rounded-xl text-sm text-navy-800 outline-none bg-gray-50/50">
+                            <button type="button" class="pw-toggle absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer" data-target="loginPassword">
+                                <svg class="pw-eye-off w-[18px] h-[18px]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M3 3l18 18"/></svg>
+                                <svg class="pw-eye w-[18px] h-[18px] hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="loginBtn"
+                        class="auth-btn w-full py-3.5 bg-gradient-to-r from-navy-700 to-navy-800 hover:from-navy-800 hover:to-navy-900 text-white font-bold text-sm rounded-xl shadow-lg cursor-pointer flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
+                        Giriş Yap
+                    </button>
+
+                    <p class="text-center text-xs text-gray-400 lg:hidden mt-4">
+                        Hesabınız yok mu?
+                        <button type="button" onclick="switchTab('register')" class="text-brand-600 font-semibold hover:underline cursor-pointer">Kayıt Olun</button>
+                    </p>
+                </form>
+
+                <!-- ═══ REGISTER FORM ═══ -->
+                <form id="registerForm" class="hidden space-y-4">
+                    <div>
+                        <h2 class="text-2xl font-extrabold text-navy-800 mb-1">Hesap Oluşturun 🚀</h2>
+                        <p class="text-sm text-gray-500">Hemen kaydolun, bilet almaya başlayın</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label for="regFirstName" class="block text-xs font-semibold text-gray-600 mb-1">Ad *</label>
+                            <input type="text" id="regFirstName" required placeholder="Adınız"
+                                class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-sm text-navy-800 outline-none bg-gray-50/50">
+                        </div>
+                        <div>
+                            <label for="regLastName" class="block text-xs font-semibold text-gray-600 mb-1">Soyad *</label>
+                            <input type="text" id="regLastName" required placeholder="Soyadınız"
+                                class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-sm text-navy-800 outline-none bg-gray-50/50">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="regTc" class="block text-xs font-semibold text-gray-600 mb-1">T.C. Kimlik No *</label>
+                        <div class="relative">
+                            <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0"/></svg>
+                            <input type="text" id="regTc" required placeholder="11 haneli TC kimlik" maxlength="11"
+                                class="input-field tc-input w-full pl-11 pr-4 py-3 border-2 border-gray-200 rounded-xl text-sm text-navy-800 outline-none bg-gray-50/50 font-mono tracking-wider">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="regEmail" class="block text-xs font-semibold text-gray-600 mb-1">E-posta *</label>
+                        <div class="relative">
+                            <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                            <input type="email" id="regEmail" required placeholder="ornek@email.com"
+                                class="input-field w-full pl-11 pr-4 py-3 border-2 border-gray-200 rounded-xl text-sm text-navy-800 outline-none bg-gray-50/50">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label for="regPassword" class="block text-xs font-semibold text-gray-600 mb-1">Şifre *</label>
+                            <input type="password" id="regPassword" required placeholder="Min 6 karakter" minlength="6"
+                                class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-sm text-navy-800 outline-none bg-gray-50/50">
+                        </div>
+                        <div>
+                            <label for="regPasswordConfirm" class="block text-xs font-semibold text-gray-600 mb-1">Şifre Tekrar *</label>
+                            <input type="password" id="regPasswordConfirm" required placeholder="Tekrar girin" minlength="6"
+                                class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-sm text-navy-800 outline-none bg-gray-50/50">
+                        </div>
+                    </div>
+
+                    <button type="submit" id="registerBtn"
+                        class="auth-btn w-full py-3.5 bg-gradient-to-r from-brand-600 to-brand-700 hover:from-brand-700 hover:to-brand-800 text-white font-bold text-sm rounded-xl shadow-lg cursor-pointer flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+                        Kayıt Ol
+                    </button>
+
+                    <p class="text-center text-xs text-gray-400 lg:hidden mt-3">
+                        Zaten hesabınız var mı?
+                        <button type="button" onclick="switchTab('login')" class="text-navy-700 font-semibold hover:underline cursor-pointer">Giriş Yapın</button>
+                    </p>
+                </form>
+
+                <!-- Footer -->
+                <p class="text-center text-[10px] text-gray-300 mt-8">
+                    © 2026 OtoBilet. Giriş yaparak
+                    <a href="#" class="text-gray-400 hover:underline">kullanım koşullarını</a> kabul edersiniz.
+                </p>
             </div>
         </div>
     </div>
 
     <script src="js/api.js"></script>
-    <script src="js/auth.js"></script>
+    <script>
+    // ── TAB SWITCHING ──
+    const tabLogin = document.getElementById('tabLogin');
+    const tabRegister = document.getElementById('tabRegister');
+    const loginForm = document.getElementById('loginForm');
+    const registerForm = document.getElementById('registerForm');
+    const alertBox = document.getElementById('authAlert');
+
+    function switchTab(tab) {
+        alertBox.classList.add('hidden');
+        if (tab === 'login') {
+            tabLogin.classList.add('active');
+            tabLogin.classList.remove('text-gray-400');
+            tabRegister.classList.remove('active');
+            tabRegister.classList.add('text-gray-400');
+            loginForm.classList.remove('hidden');
+            loginForm.classList.add('form-animate');
+            registerForm.classList.add('hidden');
+            document.title = 'Giriş Yap | OtoBilet';
+        } else {
+            tabRegister.classList.add('active');
+            tabRegister.classList.remove('text-gray-400');
+            tabLogin.classList.remove('active');
+            tabLogin.classList.add('text-gray-400');
+            registerForm.classList.remove('hidden');
+            registerForm.classList.add('form-animate');
+            loginForm.classList.add('hidden');
+            document.title = 'Kayıt Ol | OtoBilet';
+        }
+    }
+
+    tabLogin.addEventListener('click', () => switchTab('login'));
+    tabRegister.addEventListener('click', () => switchTab('register'));
+
+    // Auto-switch if URL has hash
+    if (window.location.hash === '#register') switchTab('register');
+
+    // ── ALERT ──
+    function showAlert(message, type = 'error') {
+        alertBox.textContent = message;
+        alertBox.className = `alert-animate mb-4 px-4 py-3 rounded-xl text-sm font-medium ${
+            type === 'success'
+                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                : 'bg-brand-50 text-brand-700 border border-brand-200'
+        }`;
+    }
+
+    // ── PASSWORD TOGGLE ──
+    document.querySelectorAll('.pw-toggle').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const input = document.getElementById(btn.dataset.target);
+            const isHidden = input.type === 'password';
+            input.type = isHidden ? 'text' : 'password';
+            btn.querySelector('.pw-eye-off').classList.toggle('hidden', isHidden);
+            btn.querySelector('.pw-eye').classList.toggle('hidden', !isHidden);
+        });
+    });
+
+    // ── TC INPUT: digits only ──
+    document.querySelectorAll('.tc-input').forEach(input => {
+        input.addEventListener('input', () => { input.value = input.value.replace(/\D/g, '').slice(0, 11); });
+    });
+
+    // ── LOGIN SUBMIT ──
+    loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('loginEmail').value.trim();
+        const password = document.getElementById('loginPassword').value;
+        const btn = document.getElementById('loginBtn');
+
+        btn.disabled = true;
+        btn.innerHTML = `<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg> Giriş Yapılıyor...`;
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/auth/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+            const data = await response.json();
+
+            if (!response.ok) throw new Error(data.message || 'Hatalı e-posta veya şifre.');
+
+            // Save JWT token
+            setToken(data.token);
+            showAlert('Giriş başarılı! Yönlendiriliyorsunuz...', 'success');
+
+            const role = getUserRole();
+            setTimeout(() => {
+                if (role === 'ADMIN') window.location.href = 'admin.html';
+                else if (role === 'COMPANY') window.location.href = 'company.html';
+                else window.location.href = 'index.html';
+            }, 1000);
+        } catch (err) {
+            showAlert(err.message || 'Bir hata oluştu.');
+            btn.disabled = false;
+            btn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg> Giriş Yap`;
+        }
+    });
+
+    // ── REGISTER SUBMIT ──
+    registerForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const firstName = document.getElementById('regFirstName').value.trim();
+        const lastName = document.getElementById('regLastName').value.trim();
+        const tcNo = document.getElementById('regTc').value;
+        const email = document.getElementById('regEmail').value.trim();
+        const password = document.getElementById('regPassword').value;
+        const passwordConfirm = document.getElementById('regPasswordConfirm').value;
+        const btn = document.getElementById('registerBtn');
+
+        // Validations
+        if (password !== passwordConfirm) {
+            showAlert('Şifreler eşleşmiyor!');
+            return;
+        }
+        if (tcNo.length !== 11) {
+            showAlert('T.C. Kimlik numarası 11 haneli olmalıdır.');
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = `<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg> Kayıt Olunuyor...`;
+
+        try {
+            const fullName = `${firstName} ${lastName}`;
+            const response = await fetch(`${API_BASE_URL}/auth/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ fullName, email, password, tcNo, role: 'USER' })
+            });
+            const data = await response.json();
+
+            if (!response.ok) throw new Error(data.message || 'Kayıt sırasında bir hata oluştu.');
+
+            setToken(data.token);
+            showAlert('Kayıt başarılı! Yönlendiriliyorsunuz...', 'success');
+
+            setTimeout(() => { window.location.href = 'index.html'; }, 1000);
+        } catch (err) {
+            showAlert(err.message || 'Bir hata oluştu.');
+            btn.disabled = false;
+            btn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg> Kayıt Ol`;
+        }
+    });
+    </script>
 </body>
 </html>
