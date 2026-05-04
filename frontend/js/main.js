@@ -1,13 +1,26 @@
 document.addEventListener('DOMContentLoaded', () => {
     updateNavUI();
 
-    const logoutBtn = document.getElementById('logoutBtn');
+    // Çıkış Yap butonu (navbar'daki id="navLogout")
+    const logoutBtn = document.getElementById('navLogout');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', (e) => {
             e.preventDefault();
+            // Güvenlik: tüm oturum verilerini temizle
             clearToken();
+            localStorage.removeItem('jwt_token');
+            sessionStorage.clear();
             updateNavUI();
-            window.location.reload();
+            window.location.href = 'index.html';
+        });
+    }
+
+    // Profilim butonu
+    const profileBtn = document.getElementById('navProfile');
+    if (profileBtn) {
+        profileBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = 'profile.html';
         });
     }
 });

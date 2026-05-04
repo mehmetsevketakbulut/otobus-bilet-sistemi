@@ -302,7 +302,15 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password })
             });
-            const data = await response.json();
+
+            let data;
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+                data = await response.json();
+            } else {
+                const text = await response.text();
+                data = { message: text || 'Hatalı e-posta veya şifre.' };
+            }
 
             if (!response.ok) throw new Error(data.message || 'Hatalı e-posta veya şifre.');
 
@@ -354,7 +362,15 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ fullName, email, password, tcNo, role: 'USER' })
             });
-            const data = await response.json();
+
+            let data;
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+                data = await response.json();
+            } else {
+                const text = await response.text();
+                data = { message: text || 'Kayıt sırasında bir hata oluştu.' };
+            }
 
             if (!response.ok) throw new Error(data.message || 'Kayıt sırasında bir hata oluştu.');
 

@@ -6,6 +6,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Column;
 
 @Entity
 public class Ticket {
@@ -29,6 +30,18 @@ public class Ticket {
     @JoinColumn(name = "to_stop_id")
     private TripStop toStop;
 
+    // Yeni alanlar: cinsiyet, TC No, kullanıcı ilişkisi
+    @Column(length = 10)
+    private String gender; // "male" veya "female"
+
+    @Column(length = 11)
+    private String tcNo;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    // --- Getter ve Setter ---
     public Long getId() {
         return id;
     }
@@ -75,5 +88,29 @@ public class Ticket {
 
     public void setToStop(TripStop toStop) {
         this.toStop = toStop;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public String getTcNo() {
+        return tcNo;
+    }
+
+    public void setTcNo(String tcNo) {
+        this.tcNo = tcNo;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

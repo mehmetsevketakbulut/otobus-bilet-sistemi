@@ -76,10 +76,16 @@ public class UserService {
         }
 
         public AuthResponse login(LoginRequest request) {
-                authenticationManager.authenticate(
-                                new UsernamePasswordAuthenticationToken(
-                                                request.getEmail(),
-                                                request.getPassword()));
+                try {
+                        authenticationManager.authenticate(
+                                        new UsernamePasswordAuthenticationToken(
+                                                        request.getEmail(),
+                                                        request.getPassword()));
+                } catch (org.springframework.security.authentication.BadCredentialsException e) {
+                        throw new RuntimeException("Hatalı e-posta veya şifre.");
+                } catch (org.springframework.security.core.AuthenticationException e) {
+                        throw new RuntimeException("Kimlik doğrulama hatası: " + e.getMessage());
+                }
 
                 User user = userRepository.findByEmail(request.getEmail())
                                 .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı!"));

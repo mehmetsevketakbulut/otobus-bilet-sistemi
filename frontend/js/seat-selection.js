@@ -8,10 +8,13 @@ const SeatSelection = (() => {
     let activeTripId = null;  // currently open trip id
     let selectedSeats = [];   // [{seatNo, gender}]
 
+    let currentFromStopId = null;
+    let currentToStopId = null;
+
     // ── Koltuk verilerini API'den çek ──
-    async function fetchSeats(tripId) {
+    async function fetchSeats(tripId, fromStopId, toStopId) {
         try {
-            const data = await fetchApi(`/trips/${tripId}/seats`, { method: 'GET' });
+            const data = await fetchApi(`/trips/${tripId}/seats?fromStopId=${fromStopId}&toStopId=${toStopId}`, { method: 'GET' });
             return data; // [{seatNo, status, gender}, …]
         } catch (e) {
             console.warn('Koltuk API erişilemedi, demo veri:', e);
@@ -33,7 +36,7 @@ const SeatSelection = (() => {
     }
 
     // ── Ana açma/kapama ──
-    async function toggle(tripId, busType, anchorEl) {
+    async function toggle(tripId, busType, anchorEl, fromStopId, toStopId) {
         // Zaten açıksa kapat
         if (activeTripId === tripId && activePanel) {
             close();
@@ -43,9 +46,11 @@ const SeatSelection = (() => {
         close();
 
         activeTripId = tripId;
+        currentFromStopId = fromStopId;
+        currentToStopId = toStopId;
         selectedSeats = [];
 
-        const seats = await fetchSeats(tripId);
+        const seats = await fetchSeats(tripId, fromStopId, toStopId);
         const panel = buildPanel(seats, busType, tripId);
         anchorEl.insertAdjacentElement('afterend', panel);
         activePanel = panel;
@@ -362,6 +367,8 @@ const SeatSelection = (() => {
 
         const booking = {
             tripId,
+            fromStopId: currentFromStopId,
+            toStopId: currentToStopId,
             companyName,
             from: urlParams.get('from') || '-',
             to: urlParams.get('to') || '-',

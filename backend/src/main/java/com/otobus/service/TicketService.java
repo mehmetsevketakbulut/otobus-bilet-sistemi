@@ -1,7 +1,7 @@
 package com.otobus.service;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,19 +9,83 @@ import org.springframework.transaction.annotation.Transactional;
 import com.otobus.entity.Ticket;
 import com.otobus.entity.Trip;
 import com.otobus.entity.TripStop;
+import com.otobus.entity.User;
 import com.otobus.repository.TicketRepository;
 import com.otobus.repository.TripRepository;
+import com.otobus.repository.UserRepository;
 import com.otobus.dto.request.TicketBuyRequest;
+import com.otobus.dto.response.SeatStatusResponse;
 
 @Service
 public class TicketService {
 
     private final TicketRepository ticketRepository;
     private final TripRepository tripRepository;
+    private final UserRepository userRepository;
 
-    public TicketService(TicketRepository ticketRepository, TripRepository tripRepository) {
+    public TicketService(TicketRepository ticketRepository, TripRepository tripRepository,
+            UserRepository userRepository) {
         this.ticketRepository = ticketRepository;
         this.tripRepository = tripRepository;
+        this.userRepository = userRepository;
+    }
+
+    /**
+     * Segment bazlı koltuk müsaitlik durumunu hesapla.
+     * Verilen fromStopId→toStopId aralığında her koltuk için
+     * çakışan bilet var mı kontrol eder.
+     */
+    @Transactional(readOnly = true)
+    public List<SeatStatusResponse> getSeatsForSegment(Long tripId, Long fromStopId, Long toStopId) {
+        Trip trip = tripRepository.findById(tripId)
+                .orElseThrow(() -> new RuntimeException("Sefer bulunamadı!"));
+
+        TripStop fromStop = trip.getStops().stream()
+                .filter(s -> s.getId().equals(fromStopId))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Kalkış durağı bulunamadı!"));
+
+        TripStop toStop = trip.getStops().stream()
+                .filter(s -> s.getId().equals(toStopId))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Varış durağı bulunamadı!"));
+
+        int reqFromOrder = fromStop.getStopOrder();
+        int reqToOrder = toStop.getStopOrder();
+
+        // Bu seferdeki tüm biletleri çek
+        List<Ticket> allTickets = ticketRepository.findByTripId(tripId);
+
+        int seatCapacity = trip.getOtobus().getSeatCapacity();
+        List<SeatStatusResponse> seats = new ArrayList<>();
+
+        for (int seatNo = 1; seatNo <= seatCapacity; seatNo++) {
+            final int currentSeat = seatNo;
+
+            // Bu koltuk için çakışan bilet bul
+            Ticket overlapping = allTickets.stream()
+                    .filter(t -> t.getKoltukNo() == currentSeat)
+                    .filter(t -> t.getFromStop().getStopOrder() < reqToOrder
+                            && t.getToStop().getStopOrder() > reqFromOrder)
+                    .findFirst()
+                    .orElse(null);
+
+            if (overlapping != null) {
+                seats.add(SeatStatusResponse.builder()
+                        .seatNo(currentSeat)
+                        .status("occupied")
+                        .gender(overlapping.getGender())
+                        .build());
+            } else {
+                seats.add(SeatStatusResponse.builder()
+                        .seatNo(currentSeat)
+                        .status("available")
+                        .gender(null)
+                        .build());
+            }
+        }
+
+        return seats;
     }
 
     @Transactional
@@ -63,6 +127,14 @@ public class TicketService {
         bilet.setToStop(toStop);
         bilet.setKoltukNo(request.getKoltukNo());
         bilet.setYolcuAdSoyad(request.getYolcuAdSoyad());
+        bilet.setGender(request.getGender());
+        bilet.setTcNo(request.getTcNo());
+
+        // Kullanıcı varsa ilişkilendir
+        if (request.getUserId() != null) {
+            User user = userRepository.findById(request.getUserId()).orElse(null);
+            bilet.setUser(user);
+        }
 
         Ticket savedTicket = ticketRepository.save(bilet);
 
@@ -81,6 +153,11 @@ public class TicketService {
     // listeleme altyapısı)
     public List<Ticket> tumBiletleriGetir() {
         return ticketRepository.findAll();
+    }
+
+    // Kullanıcının biletlerini getir
+    public List<Ticket> getTicketsByUserId(Long userId) {
+        return ticketRepository.findByUserId(userId);
     }
 
     // Bilet iptal etmek için (Görev: Bilet iptal etme özelliği)

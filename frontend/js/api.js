@@ -77,7 +77,15 @@ async function fetchApi(endpoint, options = {}) {
 
     try {
         const response = await fetch(url, config);
-        const data = await response.json();
+
+        let data;
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+            data = await response.json();
+        } else {
+            const text = await response.text();
+            data = { message: text || 'Bir hata oluştu!' };
+        }
         
         if (!response.ok) {
             throw new Error(data.message || 'Bir hata oluştu!');

@@ -49,9 +49,56 @@
       .route-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(0,0,0,0.1); }
       @keyframes fadeInUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
       .animate-in { animation: fadeInUp 0.6s ease forwards; }
+      /* Toast Notification */
+      .toast-container {
+        position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+        display: flex; justify-content: center; pointer-events: none;
+      }
+      .toast-box {
+        pointer-events: auto;
+        transform: translateY(-100%);
+        opacity: 0;
+        transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease;
+        margin-top: 16px;
+        max-width: 500px; width: 90%;
+      }
+      .toast-box.toast-visible {
+        transform: translateY(0);
+        opacity: 1;
+      }
+      .toast-box.toast-hiding {
+        transform: translateY(-100%);
+        opacity: 0;
+        transition: transform 0.4s ease-in, opacity 0.3s ease;
+      }
+      .toast-progress {
+        position: absolute; bottom: 0; left: 0; height: 3px;
+        background: rgba(255,255,255,0.5); border-radius: 0 0 12px 12px;
+        animation: toast-countdown linear forwards;
+      }
+      @keyframes toast-countdown { from { width: 100%; } to { width: 0%; } }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
+
+    <!-- Toast Notification -->
+    <div id="toastContainer" class="toast-container">
+        <div id="toastBox" class="toast-box">
+            <div class="relative bg-gradient-to-r from-red-600 to-red-700 text-white px-5 py-4 rounded-2xl shadow-2xl flex items-center gap-3" style="box-shadow: 0 10px 40px rgba(220,38,38,0.35)">
+                <div class="flex-shrink-0 w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+                <div class="flex-1">
+                    <p class="font-bold text-sm" id="toastTitle">Uyarı</p>
+                    <p class="text-xs text-red-100 mt-0.5" id="toastMessage">Bir hata oluştu.</p>
+                </div>
+                <button onclick="hideToast()" class="flex-shrink-0 p-1.5 rounded-lg hover:bg-white/20 transition cursor-pointer">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+                <div id="toastProgress" class="toast-progress"></div>
+            </div>
+        </div>
+    </div>
 
     <!-- Navbar -->
     <nav class="bg-white/95 backdrop-blur-md shadow-sm sticky top-0 z-50 border-b border-gray-100">
@@ -273,7 +320,7 @@
             const to = document.getElementById('toCity');
             const date = document.getElementById('tripDate').value;
             if (from.value === to.value && from.value !== '') {
-                alert('Kalkış ve varış noktası aynı olamaz!');
+                showToast('Aynı Güzergah!', 'Kalkış ve varış noktası aynı olamaz. Lütfen farklı şehirler seçin.');
                 return;
             }
             const fromName = from.options[from.selectedIndex].text;
@@ -286,6 +333,49 @@
             document.getElementById('mobileMenu').classList.toggle('hidden');
         });
     })();
+
+    // --- TOAST NOTIFICATION ---
+    let toastTimer = null;
+    let toastHideTimer = null;
+    function showToast(title, message, duration = 6500) {
+        const box = document.getElementById('toastBox');
+        const progress = document.getElementById('toastProgress');
+        document.getElementById('toastTitle').textContent = title;
+        document.getElementById('toastMessage').textContent = message;
+
+        // Clear existing timers
+        clearTimeout(toastTimer);
+        clearTimeout(toastHideTimer);
+
+        // Reset state
+        box.classList.remove('toast-visible', 'toast-hiding');
+
+        // Progress bar
+        progress.style.animation = 'none';
+        progress.offsetHeight; // reflow
+        progress.style.animationDuration = duration + 'ms';
+        progress.style.animation = `toast-countdown ${duration}ms linear forwards`;
+
+        // Show with slight delay for reflow
+        requestAnimationFrame(() => {
+            box.classList.add('toast-visible');
+        });
+
+        // Auto hide after duration
+        toastTimer = setTimeout(() => {
+            hideToast();
+        }, duration);
+    }
+
+    function hideToast() {
+        const box = document.getElementById('toastBox');
+        clearTimeout(toastTimer);
+        box.classList.remove('toast-visible');
+        box.classList.add('toast-hiding');
+        toastHideTimer = setTimeout(() => {
+            box.classList.remove('toast-hiding');
+        }, 500);
+    }
     </script>
 </body>
 </html>

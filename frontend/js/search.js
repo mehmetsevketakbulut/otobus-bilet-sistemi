@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             <p class="text-2xl font-extrabold text-brand-600">${Number(trip.price).toFixed(0)} <span class="text-base font-semibold">TL</span></p>
                             <p class="text-[10px] text-gray-400">kişi başı</p>
                         </div>
-                        <button data-trip-id="${trip.tripId}" data-bus-type="${busType}" class="select-seat-btn seat-btn bg-gradient-to-r from-brand-600 to-brand-700 hover:from-brand-700 hover:to-brand-800 text-white font-bold text-sm px-6 py-3 rounded-xl shadow-lg cursor-pointer whitespace-nowrap">
+                        <button data-trip-id="${trip.tripId}" data-bus-type="${busType}" data-from-stop-id="${trip.fromStopId}" data-to-stop-id="${trip.toStopId}" class="select-seat-btn seat-btn bg-gradient-to-r from-brand-600 to-brand-700 hover:from-brand-700 hover:to-brand-800 text-white font-bold text-sm px-6 py-3 rounded-xl shadow-lg cursor-pointer whitespace-nowrap">
                             Koltuk Seç
                         </button>
                     </div>
@@ -126,8 +126,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 e.stopPropagation();
                 const tripId = parseInt(btn.dataset.tripId);
                 const busType = btn.dataset.busType;
+                const fromStopId = parseInt(btn.dataset.fromStopId);
+                const toStopId = parseInt(btn.dataset.toStopId);
                 const cardEl = document.getElementById(`trip-card-${tripId}`);
-                SeatSelection.toggle(tripId, busType, cardEl);
+                SeatSelection.toggle(tripId, busType, cardEl, fromStopId, toStopId);
             });
         });
     }

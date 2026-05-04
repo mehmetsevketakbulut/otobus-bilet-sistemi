@@ -210,18 +210,48 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            // POST request to backend
-            const result = await fetchApi('/payments', {
-                method: 'POST',
-                body: JSON.stringify(payload)
+            // Get userId if logged in (jwt_token decode)
+            let userId = null;
+            const token = localStorage.getItem('jwt_token');
+            if (token) {
+                try {
+                    const payload = JSON.parse(atob(token.split('.')[1]));
+                    userId = payload.userId || null;
+                } catch(e) {}
+            }
+
+            // Backend expects single ticket per request. We make requests for each passenger.
+            const buyPromises = passengers.map(p => {
+                const req = {
+                    tripId: booking.tripId,
+                    fromStopId: booking.fromStopId,
+                    toStopId: booking.toStopId,
+                    koltukNo: p.seatNo,
+                    yolcuAdSoyad: p.firstName + ' ' + p.lastName,
+                    gender: p.gender,
+                    tcNo: p.tcNo,
+                    userId: userId
+                };
+                return fetchApi('/tickets/buy', {
+                    method: 'POST',
+                    body: JSON.stringify(req)
+                });
             });
-            goToConfirmation(result.pnr || 'OB-' + Date.now(), passengers);
+
+            // Wait for all tickets to be bought
+            const results = await Promise.all(buyPromises);
+            
+            // Go to confirmation page
+            const pnr = 'OB-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+            goToConfirmation(pnr, passengers);
+            
         } catch (err) {
-            // Demo mode: simulate success
-            console.warn('API erişilemedi, demo mod:', err);
-            await sleep(1500);
-            const demoPnr = 'OB-' + Math.random().toString(36).substr(2, 6).toUpperCase();
-            goToConfirmation(demoPnr, passengers);
+            console.error('Bilet kesilirken hata oluştu:', err);
+            alert('Bilet işlemi sırasında bir hata oluştu: ' + (err.message || 'Lütfen tekrar deneyin.'));
+            
+            // Revert button
+            payBtn.disabled = false;
+            payBtn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"/></svg> Güvenli Ödeme Yap`;
         }
     });
 
