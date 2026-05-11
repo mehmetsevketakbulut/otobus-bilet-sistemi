@@ -46,6 +46,11 @@
             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
             Firmalar
         </button>
+        <button data-page="pendingTrips" class="sb-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-500 cursor-pointer">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+            Sefer Talepleri
+            <span id="pendingBadge" class="hidden ml-auto px-1.5 py-0.5 text-[10px] font-bold rounded-full bg-red-500 text-white">0</span>
+        </button>
         <button data-page="users" class="sb-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-500 cursor-pointer">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
             Kullanıcılar
@@ -128,6 +133,24 @@
                             <th class="px-6 py-3">Firma</th><th class="px-6 py-3">Vergi No</th><th class="px-6 py-3">Sefer</th><th class="px-6 py-3">Kayıt</th><th class="px-6 py-3">Durum</th><th class="px-6 py-3 text-right">İşlem</th>
                         </tr></thead>
                         <tbody id="compTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- PENDING TRIPS -->
+        <div id="pgPendingTrips" class="hidden">
+            <div class="bg-dark-850 rounded-2xl border border-white/5 overflow-hidden anim">
+                <div class="px-6 py-4 border-b border-white/5 flex items-center justify-between">
+                    <h2 class="text-base font-bold text-white">🚌 Onay Bekleyen Seferler</h2>
+                    <button onclick="loadPendingTrips()" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20 transition cursor-pointer">Yenile</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead><tr class="text-left text-[11px] font-semibold text-gray-600 uppercase tracking-wider border-b border-white/5">
+                            <th class="px-6 py-3">Güzergah</th><th class="px-6 py-3">Duraklar</th><th class="px-6 py-3">Tarih / Saat</th><th class="px-6 py-3">Otobüs</th><th class="px-6 py-3">Fiyat</th><th class="px-6 py-3 text-right">İşlem</th>
+                        </tr></thead>
+                        <tbody id="pendingTable"></tbody>
                     </table>
                 </div>
             </div>

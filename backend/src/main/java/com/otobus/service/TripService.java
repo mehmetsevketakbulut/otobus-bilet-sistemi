@@ -41,4 +41,11 @@ public class TripService {
         trip.setApproved(true);
         return tripRepository.save(trip);
     }
+
+    public void rejectTrip(Long id) {
+        if (!tripRepository.existsById(id)) {
+            throw new RuntimeException("Sefer bulunamadı");
+        }
+        tripRepository.deleteById(id);
+    }
 }

@@ -8,6 +8,7 @@ import com.otobus.service.TicketService;
 import com.otobus.service.TripService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -93,6 +94,12 @@ public class TripController {
     @PostMapping("/admin/approve/{id}")
     public ResponseEntity<Trip> approveTrip(@PathVariable Long id) {
         return ResponseEntity.ok(tripService.approveTrip(id));
+    }
+
+    @DeleteMapping("/admin/reject/{id}")
+    public ResponseEntity<String> rejectTrip(@PathVariable Long id) {
+        tripService.rejectTrip(id);
+        return ResponseEntity.ok("Sefer reddedildi.");
     }
 
     @PostMapping("/company")

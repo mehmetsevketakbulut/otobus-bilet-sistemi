@@ -32,12 +32,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // ── Dashboard Verileri (Gerçek API'den) ──
     loadDashboard();
     loadCompanies();
+    loadPendingTrips();
     loadUsers();
     loadTerminals();
     loadAuditLogs();
 
     // ── Sidebar Nav ──
-    const pages = { dashboard:'Gösterge Paneli', companies:'Firmalar', users:'Kullanıcılar', terminals:'Terminaller', logs:'İşlem Logları', settings:'Sistem Ayarları' };
+    const pages = { dashboard:'Gösterge Paneli', companies:'Firmalar', pendingTrips:'Sefer Talepleri', users:'Kullanıcılar', terminals:'Terminaller', logs:'İşlem Logları', settings:'Sistem Ayarları' };
     document.querySelectorAll('.sb-link').forEach(btn => {
         btn.addEventListener('click', () => {
             const pg = btn.dataset.page;
@@ -245,3 +246,100 @@ function toggleSB() {
     document.getElementById('sidebar').classList.toggle('-translate-x-full');
     document.getElementById('sbOverlay').classList.toggle('hidden');
 }
+
+// ── Sefer Talepleri (Pending Trips) ──
+function loadPendingTrips() {
+    adminFetch('/trips/admin/pending').then(trips => {
+        const tb = document.getElementById('pendingTable');
+        const badge = document.getElementById('pendingBadge');
+
+        // Badge güncelle
+        if (badge) {
+            if (trips.length > 0) {
+                badge.textContent = trips.length;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        if (!tb) return;
+        if (!trips.length) {
+            tb.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-gray-600">Onay bekleyen sefer bulunmuyor. ✅</td></tr>';
+            return;
+        }
+        tb.innerHTML = trips.map(t => {
+            const fromCity = t.kalkisTerminali?.city?.name || t.kalkisTerminali?.name || '-';
+            const toCity = t.varisTerminali?.city?.name || t.varisTerminali?.name || '-';
+            const busPlate = t.otobus?.plate || '-';
+            const seatCap = t.otobus?.seatCapacity || '-';
+            const companyName = t.otobus?.company?.name || '-';
+            const price = t.fiyat || 0;
+            const dateStr = t.kalkisSaati ? new Date(t.kalkisSaati).toLocaleString('tr-TR', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' }) : '-';
+            const stopCount = t.stops ? t.stops.length : 0;
+
+            // Durak detayları
+            let stopsHtml = '';
+            if (t.stops && t.stops.length > 0) {
+                const sortedStops = [...t.stops].sort((a, b) => a.stopOrder - b.stopOrder);
+                stopsHtml = sortedStops.map((s, i) => {
+                    const sName = s.terminal?.city?.name || s.terminal?.name || '?';
+                    const sTime = s.departureTime ? new Date(s.departureTime).toLocaleString('tr-TR', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' }) : '';
+                    const icon = i === 0 ? '🚀' : i === sortedStops.length - 1 ? '🏁' : '🚏';
+                    return `<span class="text-[10px] bg-white/5 px-1.5 py-0.5 rounded">${icon} ${sName} <span class="text-gray-600">${sTime}</span></span>`;
+                }).join(' → ');
+            }
+
+            return `<tr class="tbl-row border-b border-white/5">
+                <td class="px-6 py-3.5">
+                    <div class="flex flex-col gap-1">
+                        <div class="flex items-center gap-2">
+                            <span class="font-semibold text-white">${fromCity}</span>
+                            <svg class="w-3 h-3 text-gray-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                            <span class="font-semibold text-white">${toCity}</span>
+                        </div>
+                        <span class="text-[10px] text-gray-600">${companyName}</span>
+                    </div>
+                </td>
+                <td class="px-6 py-3.5">
+                    <div class="flex flex-wrap items-center gap-1 max-w-xs">${stopsHtml || '<span class="text-gray-600 text-xs">Durak yok</span>'}</div>
+                </td>
+                <td class="px-6 py-3.5 text-gray-400 text-xs">${dateStr}</td>
+                <td class="px-6 py-3.5">
+                    <span class="text-xs bg-white/5 px-2 py-0.5 rounded font-medium text-gray-400">${busPlate} · ${seatCap} koltuk</span>
+                </td>
+                <td class="px-6 py-3.5 font-bold text-white">${price} ₺</td>
+                <td class="px-6 py-3.5 text-right">
+                    <div class="flex items-center justify-end gap-2">
+                        <button onclick="approveTrip(${t.id})" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/25 transition cursor-pointer">✅ Onayla</button>
+                        <button onclick="rejectTrip(${t.id})" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-red-500/15 text-red-400 hover:bg-red-500/25 transition cursor-pointer">❌ Reddet</button>
+                    </div>
+                </td>
+            </tr>`;
+        }).join('');
+    }).catch(err => {
+        console.error('Sefer talepleri yüklenemedi:', err);
+        const tb = document.getElementById('pendingTable');
+        if (tb) tb.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-gray-600">Yüklenirken hata oluştu.</td></tr>';
+    });
+}
+
+window.approveTrip = (id) => {
+    if (!confirm('Bu seferi onaylamak istediğinize emin misiniz?')) return;
+    adminFetch(`/trips/admin/approve/${id}`, { method: 'POST' })
+        .then(() => {
+            loadPendingTrips();
+            alert('✅ Sefer onaylandı!');
+        })
+        .catch(err => alert('Onaylama hatası: ' + err.message));
+};
+
+window.rejectTrip = (id) => {
+    if (!confirm('Bu seferi reddetmek istediğinize emin misiniz? Bu işlem geri alınamaz.')) return;
+    adminFetch(`/trips/admin/reject/${id}`, { method: 'DELETE' })
+        .then(() => {
+            loadPendingTrips();
+            alert('❌ Sefer reddedildi.');
+        })
+        .catch(err => alert('Reddetme hatası: ' + err.message));
+};
