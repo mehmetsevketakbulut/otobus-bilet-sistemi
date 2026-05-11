@@ -39,7 +39,7 @@ public class User implements UserDetails {
     private String phoneNumber;
 
     @com.fasterxml.jackson.annotation.JsonIgnore
-    @jakarta.persistence.Column(nullable = false, length = 255)
+    @Column(nullable = false, length = 255)
     private String password;
 
     @Enumerated(EnumType.STRING)

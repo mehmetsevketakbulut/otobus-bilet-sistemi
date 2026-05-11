@@ -37,23 +37,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function loadTrips() {
         try {
-            const allTrips = await fetchApi('/trips/admin/pending');
+            const allTrips = await fetchApi('/company/trips');
             trips = allTrips || [];
             renderTable(trips);
         } catch (e) {
-            // Fallback: Try fetching all trips
-            try {
-                const resp = await fetch(`${API_BASE_URL}/trips/admin/pending`, {
-                    headers: { 'Authorization': `Bearer ${getToken()}` }
-                });
-                if (resp.ok) {
-                    trips = await resp.json();
-                } else {
-                    trips = [];
-                }
-            } catch {
-                trips = [];
-            }
+            console.error('Seferler yüklenemedi:', e);
+            trips = [];
             renderTable(trips);
         }
     }

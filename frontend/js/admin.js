@@ -91,7 +91,7 @@ function loadDashboard() {
         const cards = document.querySelectorAll('.stat-card .text-2xl');
         if (cards[0]) cards[0].textContent = stats.totalCompanies || 0;
         if (cards[1]) cards[1].textContent = (stats.totalUsers || 0).toLocaleString('tr-TR');
-        if (cards[2]) cards[2].textContent = '₺' + ((stats.totalTickets || 0) * 9.9).toLocaleString('tr-TR', { minimumFractionDigits: 0 });
+        if (cards[2]) cards[2].textContent = (stats.totalTrips || 0).toLocaleString('tr-TR');
         if (cards[3]) cards[3].textContent = (stats.totalTickets || 0).toLocaleString('tr-TR');
     }).catch(err => console.error('Dashboard yüklenemedi:', err));
 }

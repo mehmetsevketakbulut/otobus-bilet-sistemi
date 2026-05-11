@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
+import java.security.SecureRandom;
 
 /**
  * Kullanıcı servisi.
@@ -29,6 +29,7 @@ public class UserService {
     private static final int MAX_LOGIN_ATTEMPTS = 5;
     private static final int LOCKOUT_MINUTES = 15;
     private static final long JWT_REMEMBER_ME_EXPIRATION = 604800000L; // 7 gün
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     private final UserRepository userRepository;
     private final CompanyRepository companyRepository;
@@ -64,8 +65,7 @@ public class UserService {
      * 6 haneli rastgele doğrulama kodu üretir.
      */
     private String generateVerificationCode() {
-        Random random = new Random();
-        int code = 100000 + random.nextInt(900000);
+        int code = 100000 + SECURE_RANDOM.nextInt(900000);
         return String.valueOf(code);
     }
 

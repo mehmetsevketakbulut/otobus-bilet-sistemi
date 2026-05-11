@@ -1,22 +1,6 @@
 # Proje genel dizini için Docker Compose
-version: '3.8'
 
 services:
-  # MySQL Veritabanı
-  mysql-db:
-    image: mysql:8.0
-    container_name: otobus-db
-    restart: always
-    environment:
-      MYSQL_DATABASE: otobus_db
-      MYSQL_ROOT_PASSWORD: 14i18o21101L*
-    ports:
-      - "3306:3306"
-    volumes:
-      - db_data:/var/lib/mysql
-    networks:
-      - otobus-network
-
   # Spring Boot Backend
   backend:
     build:
@@ -27,12 +11,13 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/otobus_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=14i18o21101L*
-      - JWT_SECRET=4261656C64756E67537072696E67426F6F7453656375726974794A5754546F6B656E
-    depends_on:
-      - mysql-db
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-36102938-mehmetsevketakbulut-33d4.f.aivencloud.com:17175/defaultdb?sslMode=REQUIRED
+      - SPRING_DATASOURCE_USERNAME=avnadmin
+      - SPRING_DATASOURCE_PASSWORD=${AIVEN_DB_PASSWORD}
+      - JWT_SECRET=${JWT_SECRET}
+      - MAIL_USERNAME=${MAIL_USERNAME}
+      - MAIL_PASSWORD=${MAIL_PASSWORD}
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
     networks:
       - otobus-network
 
@@ -53,6 +38,3 @@ services:
 networks:
   otobus-network:
     driver: bridge
-
-volumes:
-  db_data:

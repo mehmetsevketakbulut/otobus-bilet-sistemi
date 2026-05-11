@@ -1,4 +1,8 @@
-const API_BASE_URL = 'http://localhost:8080/api';
+// Production: Nginx proxy üzerinden /api kullanır
+// Lokal geliştirme: doğrudan backend'e bağlanır
+const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? 'http://localhost:8080/api'
+    : '/api';
 
 /**
  * Gets the stored JWT token

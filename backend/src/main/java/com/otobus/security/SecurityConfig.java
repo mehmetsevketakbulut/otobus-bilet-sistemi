@@ -74,12 +74,14 @@ public class SecurityConfig {
                         ).permitAll()
                         // Admin yetkisi gerektiren endpoint'ler
                         .requestMatchers("/api/users/all").hasAuthority("ADMIN")
+                        .requestMatchers("/api/tickets/all").hasAuthority("ADMIN")
                         .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
                         .requestMatchers("/api/audit-logs/**").hasAuthority("ADMIN")
                         .requestMatchers(org.springframework.http.HttpMethod.DELETE, "/api/users/**")
                                 .hasAuthority("ADMIN")
                         // Firma yetkisi gerektiren endpoint'ler
                         .requestMatchers("/api/trips/company/**").hasAuthority("COMPANY")
+                        .requestMatchers("/api/company/**").hasAuthority("COMPANY")
                         // Admin firma onaylama
                         .requestMatchers("/api/trips/admin/**").hasAuthority("ADMIN")
                         // Geri kalan tüm istekler authentication gerektirir
