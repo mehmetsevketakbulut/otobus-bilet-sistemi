@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/cities")
@@ -31,6 +32,15 @@ public class CityController {
     @GetMapping
     public ResponseEntity<List<City>> getAllCities() {
         return ResponseEntity.ok(cityService.getAllCities());
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<City> updateCity(@PathVariable Long id, @RequestBody Map<String, String> updates) {
+        City city = cityService.getCityById(id);
+        if (updates.containsKey("name")) {
+            city.setName(updates.get("name"));
+        }
+        return ResponseEntity.ok(cityService.addCity(city));
     }
 
     @DeleteMapping("/{id}")

@@ -16,24 +16,34 @@ import com.otobus.repository.UserRepository;
 import com.otobus.dto.request.TicketBuyRequest;
 import com.otobus.dto.response.SeatStatusResponse;
 
+/**
+ * Bilet servisi.
+ * Bilet satın alma, iptal etme, koltuk müsaitlik kontrolü ve
+ * bilet listeleme iş mantığını yürütür.
+ */
 @Service
 public class TicketService {
 
     private final TicketRepository ticketRepository;
     private final TripRepository tripRepository;
     private final UserRepository userRepository;
+    private final AuditLogService auditLogService;
+    private final NotificationService notificationService;
+    private final PaymentService paymentService;
 
     public TicketService(TicketRepository ticketRepository, TripRepository tripRepository,
-            UserRepository userRepository) {
+                         UserRepository userRepository, AuditLogService auditLogService,
+                         NotificationService notificationService, PaymentService paymentService) {
         this.ticketRepository = ticketRepository;
         this.tripRepository = tripRepository;
         this.userRepository = userRepository;
+        this.auditLogService = auditLogService;
+        this.notificationService = notificationService;
+        this.paymentService = paymentService;
     }
 
     /**
      * Segment bazlı koltuk müsaitlik durumunu hesapla.
-     * Verilen fromStopId→toStopId aralığında her koltuk için
-     * çakışan bilet var mı kontrol eder.
      */
     @Transactional(readOnly = true)
     public List<SeatStatusResponse> getSeatsForSegment(Long tripId, Long fromStopId, Long toStopId) {
@@ -53,16 +63,13 @@ public class TicketService {
         int reqFromOrder = fromStop.getStopOrder();
         int reqToOrder = toStop.getStopOrder();
 
-        // Bu seferdeki tüm biletleri çek
         List<Ticket> allTickets = ticketRepository.findByTripId(tripId);
-
         int seatCapacity = trip.getOtobus().getSeatCapacity();
         List<SeatStatusResponse> seats = new ArrayList<>();
 
         for (int seatNo = 1; seatNo <= seatCapacity; seatNo++) {
             final int currentSeat = seatNo;
 
-            // Bu koltuk için çakışan bilet bul
             Ticket overlapping = allTickets.stream()
                     .filter(t -> t.getKoltukNo() == currentSeat)
                     .filter(t -> t.getFromStop().getStopOrder() < reqToOrder
@@ -88,10 +95,20 @@ public class TicketService {
         return seats;
     }
 
+    /**
+     * Bilet satın alma — Email doğrulama, koltuk çakışma ve TC kontrolü dahil.
+     */
     @Transactional
-    public Ticket biletKes(TicketBuyRequest request) {
-        // 1. Pessimistic Lock ile seferi kilitle (Aynı anda başka bir işlem bu seferi
-        // okuyamaz/yazamaz)
+    public Ticket biletKes(TicketBuyRequest request, User user) {
+        // Email doğrulama kontrolü (MVC: iş mantığı service'de)
+        if (user != null) {
+            if (!user.isEmailVerified()) {
+                throw new RuntimeException("Bilet alabilmek için e-posta adresinizi doğrulamanız gerekmektedir.");
+            }
+            request.setUserId(user.getId());
+        }
+
+        // Pessimistic Lock ile seferi kilitle
         Trip trip = tripRepository.findByIdForUpdate(request.getTripId())
                 .orElseThrow(() -> new RuntimeException("Sefer bulunamadı!"));
 
@@ -109,18 +126,16 @@ public class TicketService {
             throw new RuntimeException("Geçersiz güzergah!");
         }
 
-        // 2. KONTROL: Bu koltuk aynı sefer için kesişen bir güzergahta alınmış mı?
+        // Koltuk çakışma kontrolü
         List<Ticket> overlapping = ticketRepository.findOverlappingTickets(
-                trip.getId(),
-                request.getKoltukNo(),
-                fromStop.getStopOrder(),
-                toStop.getStopOrder());
+                trip.getId(), request.getKoltukNo(),
+                fromStop.getStopOrder(), toStop.getStopOrder());
 
         if (!overlapping.isEmpty()) {
             throw new RuntimeException("HATA: Bu koltuk numarası seçilen güzergah için dolu!");
         }
 
-        // 2b. KONTROL: Aynı TC ile aynı sefere zaten bilet alınmış mı?
+        // TC kontrolü
         if (request.getTcNo() != null && !request.getTcNo().isEmpty()) {
             List<Ticket> allTicketsForTrip = ticketRepository.findByTripId(trip.getId());
             boolean tcAlreadyBooked = allTicketsForTrip.stream()
@@ -130,7 +145,7 @@ public class TicketService {
             }
         }
 
-        // 3. Bilet oluştur ve kaydet
+        // Bilet oluştur
         Ticket bilet = new Ticket();
         bilet.setTrip(trip);
         bilet.setFromStop(fromStop);
@@ -140,38 +155,70 @@ public class TicketService {
         bilet.setGender(request.getGender());
         bilet.setTcNo(request.getTcNo());
 
-        // Kullanıcı varsa ilişkilendir
-        if (request.getUserId() != null) {
-            User user = userRepository.findById(request.getUserId()).orElse(null);
+        if (user != null) {
             bilet.setUser(user);
         }
 
         Ticket savedTicket = ticketRepository.save(bilet);
 
-        // 4. SMS Gönderim Simülasyonu
-        System.out.println("====== SMS GÖNDERİLDİ ======");
-        System.out.println("Sayın " + request.getYolcuAdSoyad() + ", biletiniz başarıyla alınmıştır.");
-        System.out.println("Sefer: " + fromStop.getTerminal().getCity().getName() + " -> "
-                + toStop.getTerminal().getCity().getName());
-        System.out.println("Koltuk No: " + request.getKoltukNo());
-        System.out.println("============================");
+        // Ödeme kaydı oluştur
+        double price = toStop.getPriceFromStart() - fromStop.getPriceFromStart();
+        paymentService.createPayment(savedTicket, user, price, "CREDIT_CARD");
+
+        // Audit log
+        auditLogService.log(user, "CREATE", "Ticket", savedTicket.getId(),
+                "Bilet satın alındı: " + fromStop.getTerminal().getCity().getName() +
+                " → " + toStop.getTerminal().getCity().getName() +
+                " Koltuk: " + request.getKoltukNo(), null);
+
+        // Bildirim
+        if (user != null) {
+            notificationService.createNotification(user, "Bilet Satın Alındı",
+                    "Biletiniz başarıyla satın alınmıştır. Koltuk No: " + request.getKoltukNo(),
+                    "TICKET_PURCHASE");
+        }
 
         return savedTicket;
     }
 
-    // Tüm biletleri listelemek için (Görev: Kullanıcının kendi biletlerini
-    // listeleme altyapısı)
+    /**
+     * Bilet iptal etme — Sahiplik kontrolü dahil.
+     */
+    @Transactional
+    public void biletIptalEt(Long ticketId, User user) {
+        Ticket ticket = ticketRepository.findById(ticketId)
+                .orElseThrow(() -> new RuntimeException("Bilet bulunamadı!"));
+
+        // Sahiplik kontrolü (ADMIN değilse sadece kendi bileti)
+        if (user != null && !user.getRole().name().equals("ADMIN")) {
+            if (ticket.getUser() == null || !ticket.getUser().getId().equals(user.getId())) {
+                throw new RuntimeException("Bu bilet size ait değil!");
+            }
+        }
+
+        // Ödeme iadesi
+        try {
+            paymentService.refundPayment(ticketId);
+        } catch (Exception e) {
+            // Ödeme kaydı yoksa da iptal devam etsin
+        }
+
+        ticketRepository.deleteById(ticketId);
+
+        auditLogService.log(user, "DELETE", "Ticket", ticketId,
+                "Bilet iptal edildi", null);
+
+        if (user != null) {
+            notificationService.createNotification(user, "Bilet İptal Edildi",
+                    "Biletiniz başarıyla iptal edilmiştir.", "TICKET_CANCEL");
+        }
+    }
+
     public List<Ticket> tumBiletleriGetir() {
         return ticketRepository.findAll();
     }
 
-    // Kullanıcının biletlerini getir
     public List<Ticket> getTicketsByUserId(Long userId) {
         return ticketRepository.findByUserId(userId);
-    }
-
-    // Bilet iptal etmek için (Görev: Bilet iptal etme özelliği)
-    public void biletIptalEt(Long id) {
-        ticketRepository.deleteById(id);
     }
 }

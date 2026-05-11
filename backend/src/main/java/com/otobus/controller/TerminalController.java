@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/terminals")
@@ -25,6 +26,15 @@ public class TerminalController {
     @GetMapping
     public ResponseEntity<List<Terminal>> getAllTerminals() {
         return ResponseEntity.ok(terminalService.getAllTerminals());
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Terminal> updateTerminal(@PathVariable Long id, @RequestBody Map<String, String> updates) {
+        Terminal terminal = terminalService.getTerminalById(id);
+        if (updates.containsKey("name")) {
+            terminal.setName(updates.get("name"));
+        }
+        return ResponseEntity.ok(terminalService.addTerminal(terminal));
     }
 
     @DeleteMapping("/{id}")

@@ -16,15 +16,30 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.header.writers.XXssProtectionHeaderWriter;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.Map;
 
+/**
+ * Güvenlik konfigürasyonu.
+ * JWT tabanlı stateless authentication, CORS kısıtlaması, XSS koruması,
+ * rol bazlı erişim kontrolü ve güvenlik header'ları yapılandırır.
+ *
+ * NOT: CSRF koruması devre dışı bırakılmıştır çünkü uygulama stateless JWT
+ * authentication kullanmaktadır. CSRF saldırıları cookie-based session'lara
+ * yönelik olduğundan, JWT Bearer token kullanılan API'lerde CSRF korumasına
+ * gerek yoktur.
+ */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final CustomUserDetailsService userDetailsService;
+
+    @Value("${cors.allowed-origins:http://localhost:3000,http://localhost:5500,http://127.0.0.1:5500}")
+    private String allowedOrigins;
 
     public SecurityConfig(JwtAuthenticationFilter jwtAuthFilter, CustomUserDetailsService userDetailsService) {
         this.jwtAuthFilter = jwtAuthFilter;
@@ -35,21 +50,47 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .cors(org.springframework.security.config.Customizer.withDefaults())
+                // CSRF devre dışı: JWT Bearer token kullanıldığı için cookie-based CSRF saldırılarına karşı
+                // koruma gerekmez. Bu bilinçli bir tasarım kararıdır.
                 .csrf(AbstractHttpConfigurer::disable)
+                // Güvenlik header'ları
+                .headers(headers -> headers
+                        .xssProtection(xss -> xss
+                                .headerValue(XXssProtectionHeaderWriter.HeaderValue.ENABLED_MODE_BLOCK))
+                        .contentTypeOptions(opts -> {})
+                        .frameOptions(frame -> frame.deny())
+                        .httpStrictTransportSecurity(hsts -> hsts
+                                .includeSubDomains(true)
+                                .maxAgeInSeconds(31536000))
+                )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**", "/api/trips/search", "/api/cities", "/api/terminals", "/api/trips/*/seats", "/api/auth/verify-email", "/api/auth/resend-code")
-                        .permitAll()
+                        // Herkese açık endpoint'ler
+                        .requestMatchers(
+                                "/api/auth/**",
+                                "/api/trips/search",
+                                "/api/cities",
+                                "/api/terminals",
+                                "/api/trips/*/seats"
+                        ).permitAll()
+                        // Admin yetkisi gerektiren endpoint'ler
                         .requestMatchers("/api/users/all").hasAuthority("ADMIN")
+                        .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
+                        .requestMatchers("/api/audit-logs/**").hasAuthority("ADMIN")
                         .requestMatchers(org.springframework.http.HttpMethod.DELETE, "/api/users/**")
-                        .hasAuthority("ADMIN")
+                                .hasAuthority("ADMIN")
+                        // Firma yetkisi gerektiren endpoint'ler
                         .requestMatchers("/api/trips/company/**").hasAuthority("COMPANY")
+                        // Admin firma onaylama
                         .requestMatchers("/api/trips/admin/**").hasAuthority("ADMIN")
-                        .anyRequest().authenticated())
+                        // Geri kalan tüm istekler authentication gerektirir
+                        .anyRequest().authenticated()
+                )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 // Yetkisiz erişim ve authentication hataları için JSON response döndür
+                // Sistem bilgisi sızdırmayan genel hata mesajları kullanılır
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint((request, response, authException) -> {
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -71,10 +112,14 @@ public class SecurityConfig {
     @Bean
     public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource() {
         org.springframework.web.cors.CorsConfiguration configuration = new org.springframework.web.cors.CorsConfiguration();
-        configuration.setAllowedOrigins(java.util.List.of("*"));
+        // Güvenlik: Sadece belirli origin'lere izin ver, "*" yerine kısıtlı liste
+        configuration.setAllowedOrigins(java.util.List.of(allowedOrigins.split(",")));
         configuration.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(java.util.List.of("*"));
-        org.springframework.web.cors.UrlBasedCorsConfigurationSource source = new org.springframework.web.cors.UrlBasedCorsConfigurationSource();
+        configuration.setAllowedHeaders(java.util.List.of("Authorization", "Content-Type", "X-Requested-With"));
+        configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L);
+        org.springframework.web.cors.UrlBasedCorsConfigurationSource source =
+                new org.springframework.web.cors.UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }

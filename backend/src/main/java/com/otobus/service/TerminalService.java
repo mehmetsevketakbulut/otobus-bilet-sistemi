@@ -23,6 +23,11 @@ public class TerminalService {
         return terminalRepository.findAll();
     }
 
+    public Terminal getTerminalById(Long id) {
+        return terminalRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Terminal bulunamadı!"));
+    }
+
     // 3. KURAL: Otogar silinmek istendiğinde, ona bağlı sefer varsa silinemesin.
     public void deleteTerminal(Long id) {
         // DİKKAT: Sefer (Trip) tablosunu Arda yazıyor.

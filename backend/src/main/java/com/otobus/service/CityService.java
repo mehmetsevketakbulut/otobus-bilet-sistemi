@@ -32,6 +32,11 @@ public class CityService {
         return cityRepository.findAll();
     }
 
+    public City getCityById(Long id) {
+        return cityRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Şehir bulunamadı!"));
+    }
+
     public void deleteCity(Long id) {
         cityRepository.deleteById(id);
     }

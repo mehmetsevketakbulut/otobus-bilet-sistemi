@@ -28,6 +28,11 @@ public class BusService {
         return busRepository.findAll();
     }
 
+    public Bus getBusById(Long id) {
+        return busRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Otobüs bulunamadı!"));
+    }
+
     public void deleteBus(Long id) {
         busRepository.deleteById(id);
     }
