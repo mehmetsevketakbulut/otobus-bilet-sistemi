@@ -2,6 +2,7 @@ package com.otobus.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "trip_stops")
@@ -13,6 +14,7 @@ public class TripStop {
 
     @ManyToOne
     @JoinColumn(name = "trip_id", nullable = false)
+    @JsonIgnore
     private Trip trip;
 
     @ManyToOne
