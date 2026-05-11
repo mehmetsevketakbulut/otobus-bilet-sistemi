@@ -37,7 +37,7 @@ public class SecurityConfig {
                 .cors(org.springframework.security.config.Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**", "/api/trips/search", "/api/cities", "/api/terminals", "/api/trips/*/seats", "/api/tickets/buy")
+                        .requestMatchers("/api/auth/**", "/api/trips/search", "/api/cities", "/api/terminals", "/api/trips/*/seats", "/api/auth/verify-email", "/api/auth/resend-code")
                         .permitAll()
                         .requestMatchers("/api/users/all").hasAuthority("ADMIN")
                         .requestMatchers(org.springframework.http.HttpMethod.DELETE, "/api/users/**")
