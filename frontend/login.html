@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,41 +8,125 @@
     <meta name="description" content="OtoBilet hesabınıza giriş yapın veya yeni hesap oluşturun.">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            brand: { 50:'#fef2f2',100:'#fee2e2',200:'#fecaca',500:'#ef4444',600:'#dc2626',700:'#b91c1c',800:'#991b1b' },
-            navy: { 50:'#f0f4ff',100:'#e0e7ff',600:'#1e3a5f',700:'#172e4a',800:'#0f1f35',900:'#0a1628' }
-          },
-          fontFamily: { sans: ['Inter', 'sans-serif'] }
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { 50: '#fef2f2', 100: '#fee2e2', 200: '#fecaca', 500: '#ef4444', 600: '#dc2626', 700: '#b91c1c', 800: '#991b1b' },
+                        navy: { 50: '#f0f4ff', 100: '#e0e7ff', 600: '#1e3a5f', 700: '#172e4a', 800: '#0f1f35', 900: '#0a1628' }
+                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }
+                }
+            }
         }
-      }
-    }
     </script>
     <style>
-      * { font-family: 'Inter', sans-serif; }
-      .input-field { transition: border-color 0.2s, box-shadow 0.2s; }
-      .input-field:focus { border-color: #1e3a5f; box-shadow: 0 0 0 3px rgba(30,58,95,0.1); }
-      .input-field.error { border-color: #dc2626; box-shadow: 0 0 0 3px rgba(220,38,38,0.1); }
-      .auth-btn { transition: all 0.3s ease; }
-      .auth-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(30,58,95,0.3); }
-      .auth-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-      .tab-btn { transition: all 0.2s ease; position: relative; }
-      .tab-btn::after { content:''; position: absolute; bottom: -2px; left: 0; right: 0; height: 3px; border-radius: 2px; background: transparent; transition: background 0.3s; }
-      .tab-btn.active { color: #1e3a5f; }
-      .tab-btn.active::after { background: #dc2626; }
-      @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
-      .form-animate { animation: fadeIn 0.35s ease forwards; }
-      @keyframes slideUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
-      .alert-animate { animation: slideUp 0.3s ease forwards; }
-      .hero-overlay { background: linear-gradient(to top, rgba(10,22,40,0.85) 0%, rgba(10,22,40,0.3) 50%, rgba(10,22,40,0.5) 100%); }
-      .pw-toggle { transition: color 0.2s; }
-      .pw-toggle:hover { color: #1e3a5f; }
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .input-field {
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .input-field:focus {
+            border-color: #1e3a5f;
+            box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.1);
+        }
+
+        .input-field.error {
+            border-color: #dc2626;
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+        }
+
+        .auth-btn {
+            transition: all 0.3s ease;
+        }
+
+        .auth-btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(30, 58, 95, 0.3);
+        }
+
+        .auth-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .tab-btn {
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .tab-btn::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            border-radius: 2px;
+            background: transparent;
+            transition: background 0.3s;
+        }
+
+        .tab-btn.active {
+            color: #1e3a5f;
+        }
+
+        .tab-btn.active::after {
+            background: #dc2626;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .form-animate {
+            animation: fadeIn 0.35s ease forwards;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(8px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .alert-animate {
+            animation: slideUp 0.3s ease forwards;
+        }
+
+        .hero-overlay {
+            background: linear-gradient(to top, rgba(10, 22, 40, 0.85) 0%, rgba(10, 22, 40, 0.3) 50%, rgba(10, 22, 40, 0.5) 100%);
+        }
+
+        .pw-toggle {
+            transition: color 0.2s;
+        }
+
+        .pw-toggle:hover {
+            color: #1e3a5f;
+        }
     </style>
 </head>
+
 <body class="bg-gray-50 min-h-screen">
 
     <div class="flex min-h-screen">
@@ -52,7 +137,11 @@
             <div class="relative z-10 flex flex-col justify-end p-12 pb-16">
                 <a href="index.html" class="flex items-center gap-2 text-2xl font-extrabold mb-8">
                     <div class="w-9 h-9 bg-white/20 backdrop-blur-md rounded-lg flex items-center justify-center">
-                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 7h8m-8 4h8m-4 4v3m-6-3h12a2 2 0 002-2V5a2 2 0 00-2-2H6a2 2 0 00-2 2v8a2 2 0 002 2zm-2 3h16"/></svg>
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2"
+                            viewBox="0 0 24 24">
+                            <path
+                                d="M8 7h8m-8 4h8m-4 4v3m-6-3h12a2 2 0 002-2V5a2 2 0 00-2-2H6a2 2 0 00-2 2v8a2 2 0 002 2zm-2 3h16" />
+                        </svg>
                     </div>
                     <span class="text-white">Oto<span class="text-brand-500">Bilet</span></span>
                 </a>
@@ -60,7 +149,8 @@
                     Yolculuğunuz<br>burada başlıyor
                 </h2>
                 <p class="text-gray-300 text-sm leading-relaxed max-w-md">
-                    Türkiye'nin dört bir yanına uygun fiyatlı otobüs biletleri. Hesabınıza giriş yaparak biletlerinizi yönetin.
+                    Türkiye'nin dört bir yanına uygun fiyatlı otobüs biletleri. Hesabınıza giriş yaparak biletlerinizi
+                    yönetin.
                 </p>
                 <!-- Stats -->
                 <div class="flex gap-6 mt-8">
@@ -86,19 +176,26 @@
                 <!-- Mobile logo -->
                 <div class="lg:hidden mb-8 text-center">
                     <a href="index.html" class="inline-flex items-center gap-2 text-2xl font-extrabold">
-                        <div class="w-9 h-9 bg-gradient-to-br from-brand-600 to-brand-700 rounded-lg flex items-center justify-center">
-                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 7h8m-8 4h8m-4 4v3m-6-3h12a2 2 0 002-2V5a2 2 0 00-2-2H6a2 2 0 00-2 2v8a2 2 0 002 2zm-2 3h16"/></svg>
+                        <div
+                            class="w-9 h-9 bg-gradient-to-br from-brand-600 to-brand-700 rounded-lg flex items-center justify-center">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2"
+                                viewBox="0 0 24 24">
+                                <path
+                                    d="M8 7h8m-8 4h8m-4 4v3m-6-3h12a2 2 0 002-2V5a2 2 0 00-2-2H6a2 2 0 00-2 2v8a2 2 0 002 2zm-2 3h16" />
+                            </svg>
                         </div>
                         <span class="text-navy-800">Oto<span class="text-brand-600">Bilet</span></span>
                     </a>
                 </div>
 
                 <!-- Tabs -->
-                <div class="flex border-b-2 border-gray-200 mb-8">
-                    <button id="tabLogin" class="tab-btn active flex-1 pb-3 text-sm font-bold uppercase tracking-wider cursor-pointer text-navy-800">
+                <div id="authTabs" class="flex border-b-2 border-gray-200 mb-8">
+                    <button id="tabLogin"
+                        class="tab-btn active flex-1 pb-3 text-sm font-bold uppercase tracking-wider cursor-pointer text-navy-800">
                         Giriş Yap
                     </button>
-                    <button id="tabRegister" class="tab-btn flex-1 pb-3 text-sm font-bold uppercase tracking-wider cursor-pointer text-gray-400">
+                    <button id="tabRegister"
+                        class="tab-btn flex-1 pb-3 text-sm font-bold uppercase tracking-wider cursor-pointer text-gray-400">
                         Kayıt Ol
                     </button>
                 </div>
@@ -114,9 +211,14 @@
                     </div>
 
                     <div>
-                        <label for="loginEmail" class="block text-xs font-semibold text-gray-600 mb-1.5">E-posta Adresi</label>
+                        <label for="loginEmail" class="block text-xs font-semibold text-gray-600 mb-1.5">E-posta
+                            Adresi</label>
                         <div class="relative">
-                            <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                            <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-gray-400"
+                                fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path
+                                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
                             <input type="email" id="loginEmail" required placeholder="ornek@email.com"
                                 class="input-field w-full pl-11 pr-4 py-3.5 border-2 border-gray-200 rounded-xl text-sm text-navy-800 outline-none bg-gray-50/50">
                         </div>
@@ -125,15 +227,28 @@
                     <div>
                         <div class="flex justify-between items-center mb-1.5">
                             <label for="loginPassword" class="text-xs font-semibold text-gray-600">Şifre</label>
-                            <a href="#" class="text-xs font-medium text-brand-600 hover:text-brand-700 transition">Şifremi Unuttum</a>
                         </div>
                         <div class="relative">
-                            <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"/></svg>
+                            <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-gray-400"
+                                fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path
+                                    d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" />
+                            </svg>
                             <input type="password" id="loginPassword" required placeholder="••••••••" minlength="6"
                                 class="input-field w-full pl-11 pr-11 py-3.5 border-2 border-gray-200 rounded-xl text-sm text-navy-800 outline-none bg-gray-50/50">
-                            <button type="button" class="pw-toggle absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer" data-target="loginPassword">
-                                <svg class="pw-eye-off w-[18px] h-[18px]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M3 3l18 18"/></svg>
-                                <svg class="pw-eye w-[18px] h-[18px] hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                            <button type="button"
+                                class="pw-toggle absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer"
+                                data-target="loginPassword">
+                                <svg class="pw-eye-off w-[18px] h-[18px]" fill="none" stroke="currentColor"
+                                    stroke-width="2" viewBox="0 0 24 24">
+                                    <path
+                                        d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M3 3l18 18" />
+                                </svg>
+                                <svg class="pw-eye w-[18px] h-[18px] hidden" fill="none" stroke="currentColor"
+                                    stroke-width="2" viewBox="0 0 24 24">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                    <circle cx="12" cy="12" r="3" />
+                                </svg>
                             </button>
                         </div>
                     </div>
@@ -141,21 +256,28 @@
                     <div class="flex items-center gap-2">
                         <input type="checkbox" id="rememberMe"
                             class="w-4 h-4 rounded border-gray-300 text-navy-600 focus:ring-navy-500 cursor-pointer accent-navy-700">
-                        <label for="rememberMe" class="text-xs font-medium text-gray-500 cursor-pointer select-none">Beni Hatırla</label>
+                        <label for="rememberMe"
+                            class="text-xs font-medium text-gray-500 cursor-pointer select-none">Beni Hatırla</label>
                     </div>
 
                     <button type="submit" id="loginBtn"
                         class="auth-btn w-full py-3.5 bg-gradient-to-r from-navy-700 to-navy-800 hover:from-navy-800 hover:to-navy-900 text-white font-bold text-sm rounded-xl shadow-lg cursor-pointer flex items-center justify-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path
+                                d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                        </svg>
                         Giriş Yap
                     </button>
 
                     <div class="flex items-center justify-between">
                         <p class="text-xs text-gray-400 lg:hidden">
                             Hesabınız yok mu?
-                            <button type="button" onclick="switchTab('register')" class="text-brand-600 font-semibold hover:underline cursor-pointer">Kayıt Olun</button>
+                            <button type="button" onclick="switchTab('register')"
+                                class="text-brand-600 font-semibold hover:underline cursor-pointer">Kayıt Olun</button>
                         </p>
-                        <button type="button" onclick="showForgotPassword()" class="text-xs text-navy-600 font-semibold hover:underline cursor-pointer">Şifremi Unuttum</button>
+                        <button type="button" onclick="showForgotPassword()"
+                            class="text-xs text-navy-600 font-semibold hover:underline cursor-pointer">Şifremi
+                            Unuttum</button>
                     </div>
                 </form>
 
@@ -164,14 +286,24 @@
                     <!-- Step 1: Email gir -->
                     <div id="fpStep1" class="space-y-4">
                         <div class="text-center mb-2">
-                            <div class="w-14 h-14 bg-navy-50 rounded-full flex items-center justify-center mx-auto mb-3">
-                                <svg class="w-7 h-7 text-navy-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+                            <div
+                                class="w-14 h-14 bg-navy-50 rounded-full flex items-center justify-center mx-auto mb-3">
+                                <svg class="w-7 h-7 text-navy-600" fill="none" stroke="currentColor" stroke-width="2"
+                                    viewBox="0 0 24 24">
+                                    <path
+                                        d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                                </svg>
                             </div>
                             <h3 class="text-base font-bold text-navy-800">Şifre Sıfırlama</h3>
-                            <p class="text-xs text-gray-400 mt-1">E-posta adresinize bir doğrulama kodu göndereceğiz.</p>
+                            <p class="text-xs text-gray-400 mt-1">E-posta adresinize bir doğrulama kodu göndereceğiz.
+                            </p>
                         </div>
                         <div class="relative">
-                            <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                            <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-gray-400"
+                                fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path
+                                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
                             <input type="email" id="fpEmail" required placeholder="E-posta adresiniz"
                                 class="profile-input w-full pl-11 pr-4 py-3.5 border-2 border-gray-200 rounded-xl text-sm text-navy-800 outline-none bg-gray-50/50">
                         </div>
@@ -193,6 +325,10 @@
                             class="auth-btn w-full py-3.5 bg-gradient-to-r from-navy-700 to-navy-800 text-white font-bold text-sm rounded-xl shadow-lg cursor-pointer">
                             Kodu Doğrula
                         </button>
+                        <div class="text-center mt-2">
+                            <p id="fpTimerText" class="text-xs text-gray-500 font-medium">Kalan süre: <span id="fpTimer" class="text-brand-600 font-bold">03:00</span></p>
+                            <button type="button" id="fpResendBtn" onclick="sendResetCode()" class="hidden text-xs text-navy-600 font-semibold hover:underline cursor-pointer w-full text-center mt-1">Kodu Tekrar Gönder</button>
+                        </div>
                     </div>
 
                     <!-- Step 3: Yeni şifre -->
@@ -210,7 +346,8 @@
                         </button>
                     </div>
 
-                    <button type="button" onclick="hideForgotPassword()" class="w-full text-center text-xs text-gray-400 hover:text-navy-600 transition cursor-pointer mt-2">
+                    <button type="button" onclick="hideForgotPassword()"
+                        class="w-full text-center text-xs text-gray-400 hover:text-navy-600 transition cursor-pointer mt-2">
                         ← Giriş ekranına dön
                     </button>
                 </div>
@@ -224,21 +361,28 @@
 
                     <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label for="regFirstName" class="block text-xs font-semibold text-gray-600 mb-1">Ad *</label>
+                            <label for="regFirstName" class="block text-xs font-semibold text-gray-600 mb-1">Ad
+                                *</label>
                             <input type="text" id="regFirstName" required placeholder="Adınız"
                                 class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-sm text-navy-800 outline-none bg-gray-50/50">
                         </div>
                         <div>
-                            <label for="regLastName" class="block text-xs font-semibold text-gray-600 mb-1">Soyad *</label>
+                            <label for="regLastName" class="block text-xs font-semibold text-gray-600 mb-1">Soyad
+                                *</label>
                             <input type="text" id="regLastName" required placeholder="Soyadınız"
                                 class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-sm text-navy-800 outline-none bg-gray-50/50">
                         </div>
                     </div>
 
                     <div>
-                        <label for="regTc" class="block text-xs font-semibold text-gray-600 mb-1">T.C. Kimlik No *</label>
+                        <label for="regTc" class="block text-xs font-semibold text-gray-600 mb-1">T.C. Kimlik No
+                            *</label>
                         <div class="relative">
-                            <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0"/></svg>
+                            <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-gray-400"
+                                fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path
+                                    d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0" />
+                            </svg>
                             <input type="text" id="regTc" required placeholder="11 haneli TC kimlik" maxlength="11"
                                 class="input-field tc-input w-full pl-11 pr-4 py-3 border-2 border-gray-200 rounded-xl text-sm text-navy-800 outline-none bg-gray-50/50 font-mono tracking-wider">
                         </div>
@@ -247,7 +391,11 @@
                     <div>
                         <label for="regEmail" class="block text-xs font-semibold text-gray-600 mb-1">E-posta *</label>
                         <div class="relative">
-                            <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                            <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-gray-400"
+                                fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path
+                                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
                             <input type="email" id="regEmail" required placeholder="ornek@email.com"
                                 class="input-field w-full pl-11 pr-4 py-3 border-2 border-gray-200 rounded-xl text-sm text-navy-800 outline-none bg-gray-50/50">
                         </div>
@@ -255,26 +403,33 @@
 
                     <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label for="regPassword" class="block text-xs font-semibold text-gray-600 mb-1">Şifre *</label>
+                            <label for="regPassword" class="block text-xs font-semibold text-gray-600 mb-1">Şifre
+                                *</label>
                             <input type="password" id="regPassword" required placeholder="Min 6 karakter" minlength="6"
                                 class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-sm text-navy-800 outline-none bg-gray-50/50">
                         </div>
                         <div>
-                            <label for="regPasswordConfirm" class="block text-xs font-semibold text-gray-600 mb-1">Şifre Tekrar *</label>
-                            <input type="password" id="regPasswordConfirm" required placeholder="Tekrar girin" minlength="6"
+                            <label for="regPasswordConfirm" class="block text-xs font-semibold text-gray-600 mb-1">Şifre
+                                Tekrar *</label>
+                            <input type="password" id="regPasswordConfirm" required placeholder="Tekrar girin"
+                                minlength="6"
                                 class="input-field w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-sm text-navy-800 outline-none bg-gray-50/50">
                         </div>
                     </div>
 
                     <button type="submit" id="registerBtn"
                         class="auth-btn w-full py-3.5 bg-gradient-to-r from-brand-600 to-brand-700 hover:from-brand-700 hover:to-brand-800 text-white font-bold text-sm rounded-xl shadow-lg cursor-pointer flex items-center justify-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path
+                                d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                        </svg>
                         Kayıt Ol
                     </button>
 
                     <p class="text-center text-xs text-gray-400 lg:hidden mt-3">
                         Zaten hesabınız var mı?
-                        <button type="button" onclick="switchTab('login')" class="text-navy-700 font-semibold hover:underline cursor-pointer">Giriş Yapın</button>
+                        <button type="button" onclick="switchTab('login')"
+                            class="text-navy-700 font-semibold hover:underline cursor-pointer">Giriş Yapın</button>
                     </p>
                 </form>
 
@@ -282,10 +437,15 @@
                 <div id="verifyForm" class="hidden space-y-5">
                     <div class="text-center">
                         <div class="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <svg class="w-8 h-8 text-emerald-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                            <svg class="w-8 h-8 text-emerald-500" fill="none" stroke="currentColor" stroke-width="2"
+                                viewBox="0 0 24 24">
+                                <path
+                                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
                         </div>
                         <h2 class="text-2xl font-extrabold text-navy-800 mb-1">E-posta Doğrulama 📧</h2>
-                        <p class="text-sm text-gray-500"><span id="verifyEmailDisplay" class="font-semibold text-navy-700"></span> adresine gönderilen 6 haneli kodu girin</p>
+                        <p class="text-sm text-gray-500"><span id="verifyEmailDisplay"
+                                class="font-semibold text-navy-700"></span> adresine gönderilen 6 haneli kodu girin</p>
                     </div>
 
                     <div>
@@ -298,7 +458,9 @@
 
                     <button type="button" id="verifyBtn"
                         class="auth-btn w-full py-3.5 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold text-sm rounded-xl shadow-lg cursor-pointer flex items-center justify-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
                         Doğrula
                     </button>
 
@@ -322,369 +484,408 @@
 
     <script src="js/api.js"></script>
     <script>
-    // ── TAB SWITCHING ──
-    const tabLogin = document.getElementById('tabLogin');
-    const tabRegister = document.getElementById('tabRegister');
-    const loginForm = document.getElementById('loginForm');
-    const registerForm = document.getElementById('registerForm');
-    const alertBox = document.getElementById('authAlert');
+        // ── TAB SWITCHING ──
+        const tabLogin = document.getElementById('tabLogin');
+        const tabRegister = document.getElementById('tabRegister');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const alertBox = document.getElementById('authAlert');
 
-    function switchTab(tab) {
-        alertBox.classList.add('hidden');
-        if (tab === 'login') {
-            tabLogin.classList.add('active');
-            tabLogin.classList.remove('text-gray-400');
-            tabRegister.classList.remove('active');
-            tabRegister.classList.add('text-gray-400');
-            loginForm.classList.remove('hidden');
-            loginForm.classList.add('form-animate');
-            registerForm.classList.add('hidden');
-            document.title = 'Giriş Yap | OtoBilet';
-        } else {
-            tabRegister.classList.add('active');
-            tabRegister.classList.remove('text-gray-400');
-            tabLogin.classList.remove('active');
-            tabLogin.classList.add('text-gray-400');
-            registerForm.classList.remove('hidden');
-            registerForm.classList.add('form-animate');
-            loginForm.classList.add('hidden');
-            document.title = 'Kayıt Ol | OtoBilet';
-        }
-    }
-
-    tabLogin.addEventListener('click', () => switchTab('login'));
-    tabRegister.addEventListener('click', () => switchTab('register'));
-
-    // Auto-switch if URL has hash
-    if (window.location.hash === '#register') switchTab('register');
-
-    // ── BENI HATIRLA: Kayıtlı email varsa yükle ──
-    const savedEmail = localStorage.getItem('remembered_email');
-    if (savedEmail) {
-        document.getElementById('loginEmail').value = savedEmail;
-        document.getElementById('rememberMe').checked = true;
-    }
-
-    // ── ALERT ──
-    function showAlert(message, type = 'error') {
-        alertBox.textContent = message;
-        alertBox.className = `alert-animate mb-4 px-4 py-3 rounded-xl text-sm font-medium ${
-            type === 'success'
-                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                : 'bg-brand-50 text-brand-700 border border-brand-200'
-        }`;
-    }
-
-    // ── PASSWORD TOGGLE ──
-    document.querySelectorAll('.pw-toggle').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const input = document.getElementById(btn.dataset.target);
-            const isHidden = input.type === 'password';
-            input.type = isHidden ? 'text' : 'password';
-            btn.querySelector('.pw-eye-off').classList.toggle('hidden', isHidden);
-            btn.querySelector('.pw-eye').classList.toggle('hidden', !isHidden);
-        });
-    });
-
-    // ── TC INPUT: digits only ──
-    document.querySelectorAll('.tc-input').forEach(input => {
-        input.addEventListener('input', () => { input.value = input.value.replace(/\D/g, '').slice(0, 11); });
-    });
-
-    // ── LOGIN SUBMIT ──
-    loginForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const email = document.getElementById('loginEmail').value.trim();
-        const password = document.getElementById('loginPassword').value;
-        const btn = document.getElementById('loginBtn');
-
-        btn.disabled = true;
-        btn.innerHTML = `<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg> Giriş Yapılıyor...`;
-
-        const rememberMe = document.getElementById('rememberMe').checked;
-
-        try {
-            const response = await fetch(`${API_BASE_URL}/auth/login`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password, rememberMe })
-            });
-
-            let data;
-            const contentType = response.headers.get('content-type');
-            if (contentType && contentType.includes('application/json')) {
-                data = await response.json();
-            } else {
-                const text = await response.text();
-                data = { message: text || 'Hatalı e-posta veya şifre.' };
-            }
-
-            if (!response.ok) throw new Error(data.message || 'Hatalı e-posta veya şifre.');
-
-            // Save JWT token
-            setToken(data.token);
-
-            // Beni Hatırla
-            if (rememberMe) {
-                localStorage.setItem('remembered_email', email);
-            } else {
-                localStorage.removeItem('remembered_email');
-            }
-
-            showAlert('Giriş başarılı! Yönlendiriliyorsunuz...', 'success');
-
-            const role = getUserRole();
-            setTimeout(() => {
-                if (role === 'ADMIN') window.location.href = 'admin.html';
-                else if (role === 'COMPANY') window.location.href = 'company.html';
-                else window.location.href = 'index.html';
-            }, 1000);
-        } catch (err) {
-            showAlert(err.message || 'Bir hata oluştu.');
-            btn.disabled = false;
-            btn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg> Giriş Yap`;
-        }
-    });
-
-    // ── REGISTER SUBMIT ──
-    let pendingVerificationEmail = '';
-
-    registerForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const firstName = document.getElementById('regFirstName').value.trim();
-        const lastName = document.getElementById('regLastName').value.trim();
-        const tcNo = document.getElementById('regTc').value;
-        const email = document.getElementById('regEmail').value.trim();
-        const password = document.getElementById('regPassword').value;
-        const passwordConfirm = document.getElementById('regPasswordConfirm').value;
-        const btn = document.getElementById('registerBtn');
-
-        // Validations
-        if (password !== passwordConfirm) {
-            showAlert('Şifreler eşleşmiyor!');
-            return;
-        }
-        if (tcNo.length !== 11) {
-            showAlert('T.C. Kimlik numarası 11 haneli olmalıdır.');
-            return;
-        }
-
-        btn.disabled = true;
-        btn.innerHTML = `<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg> Kayıt Olunuyor...`;
-
-        try {
-            const fullName = `${firstName} ${lastName}`;
-            const response = await fetch(`${API_BASE_URL}/auth/register`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ fullName, email, password, tcNo, role: 'USER' })
-            });
-
-            let data;
-            const contentType = response.headers.get('content-type');
-            if (contentType && contentType.includes('application/json')) {
-                data = await response.json();
-            } else {
-                const text = await response.text();
-                data = { message: text || 'Kayıt sırasında bir hata oluştu.' };
-            }
-
-            if (!response.ok) throw new Error(data.message || 'Kayıt sırasında bir hata oluştu.');
-
-            // Token'ı kaydet
-            setToken(data.token);
-            pendingVerificationEmail = email;
-
-            // Doğrulama formunu göster
-            registerForm.classList.add('hidden');
-            loginForm.classList.add('hidden');
-            document.getElementById('verifyForm').classList.remove('hidden');
-            document.getElementById('verifyForm').classList.add('form-animate');
-            document.getElementById('verifyEmailDisplay').textContent = email;
-            document.querySelector('.border-b-2').classList.add('hidden'); // Tab bar'ı gizle
+        function switchTab(tab) {
             alertBox.classList.add('hidden');
-            document.title = 'E-posta Doğrulama | OtoBilet';
-
-        } catch (err) {
-            showAlert(err.message || 'Bir hata oluştu.');
-            btn.disabled = false;
-            btn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg> Kayıt Ol`;
-        }
-    });
-
-    // ── EMAIL VERIFICATION ──
-    document.getElementById('verifyCode').addEventListener('input', function() {
-        this.value = this.value.replace(/\D/g, '').slice(0, 6);
-    });
-
-    document.getElementById('verifyBtn').addEventListener('click', async () => {
-        const code = document.getElementById('verifyCode').value.trim();
-        const btn = document.getElementById('verifyBtn');
-
-        if (code.length !== 6) {
-            showAlert('Lütfen 6 haneli doğrulama kodunu girin.');
-            return;
-        }
-
-        btn.disabled = true;
-        btn.innerHTML = `<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg> Doğrulanıyor...`;
-
-        try {
-            const response = await fetch(`${API_BASE_URL}/auth/verify-email`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: pendingVerificationEmail, code: code })
-            });
-
-            let data;
-            const contentType = response.headers.get('content-type');
-            if (contentType && contentType.includes('application/json')) {
-                data = await response.json();
+            if (tab === 'login') {
+                tabLogin.classList.add('active');
+                tabLogin.classList.remove('text-gray-400');
+                tabRegister.classList.remove('active');
+                tabRegister.classList.add('text-gray-400');
+                loginForm.classList.remove('hidden');
+                loginForm.classList.add('form-animate');
+                registerForm.classList.add('hidden');
+                document.title = 'Giriş Yap | OtoBilet';
             } else {
-                const text = await response.text();
-                data = { message: text || 'Doğrulama sırasında bir hata oluştu.' };
+                tabRegister.classList.add('active');
+                tabRegister.classList.remove('text-gray-400');
+                tabLogin.classList.remove('active');
+                tabLogin.classList.add('text-gray-400');
+                registerForm.classList.remove('hidden');
+                registerForm.classList.add('form-animate');
+                loginForm.classList.add('hidden');
+                document.title = 'Kayıt Ol | OtoBilet';
+            }
+        }
+
+        tabLogin.addEventListener('click', () => switchTab('login'));
+        tabRegister.addEventListener('click', () => switchTab('register'));
+
+        // Auto-switch if URL has hash
+        if (window.location.hash === '#register') switchTab('register');
+
+        // ── BENI HATIRLA: Kayıtlı email varsa yükle ──
+        const savedEmail = localStorage.getItem('remembered_email');
+        if (savedEmail) {
+            document.getElementById('loginEmail').value = savedEmail;
+            document.getElementById('rememberMe').checked = true;
+        }
+
+        // ── ALERT ──
+        function showAlert(message, type = 'error') {
+            alertBox.textContent = message;
+            alertBox.className = `alert-animate mb-4 px-4 py-3 rounded-xl text-sm font-medium ${type === 'success'
+                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                    : 'bg-brand-50 text-brand-700 border border-brand-200'
+                }`;
+        }
+
+        // ── PASSWORD TOGGLE ──
+        document.querySelectorAll('.pw-toggle').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const input = document.getElementById(btn.dataset.target);
+                const isHidden = input.type === 'password';
+                input.type = isHidden ? 'text' : 'password';
+                btn.querySelector('.pw-eye-off').classList.toggle('hidden', isHidden);
+                btn.querySelector('.pw-eye').classList.toggle('hidden', !isHidden);
+            });
+        });
+
+        // ── TC INPUT: digits only ──
+        document.querySelectorAll('.tc-input').forEach(input => {
+            input.addEventListener('input', () => { input.value = input.value.replace(/\D/g, '').slice(0, 11); });
+        });
+
+        // ── LOGIN SUBMIT ──
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const btn = document.getElementById('loginBtn');
+
+            btn.disabled = true;
+            btn.innerHTML = `<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg> Giriş Yapılıyor...`;
+
+            const rememberMe = document.getElementById('rememberMe').checked;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password, rememberMe })
+                });
+
+                let data;
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) {
+                    data = await response.json();
+                } else {
+                    const text = await response.text();
+                    data = { message: text || 'Hatalı e-posta veya şifre.' };
+                }
+
+                if (!response.ok) throw new Error(data.message || 'Hatalı e-posta veya şifre.');
+
+                // Save JWT token
+                setToken(data.token);
+
+                // Beni Hatırla
+                if (rememberMe) {
+                    localStorage.setItem('remembered_email', email);
+                } else {
+                    localStorage.removeItem('remembered_email');
+                }
+
+                showAlert('Giriş başarılı! Yönlendiriliyorsunuz...', 'success');
+
+                const role = getUserRole();
+                setTimeout(() => {
+                    if (role === 'ADMIN') window.location.href = 'admin.html';
+                    else if (role === 'COMPANY') window.location.href = 'company.html';
+                    else window.location.href = 'index.html';
+                }, 1000);
+            } catch (err) {
+                showAlert(err.message || 'Bir hata oluştu.');
+                btn.disabled = false;
+                btn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg> Giriş Yap`;
+            }
+        });
+
+        // ── REGISTER SUBMIT ──
+        let pendingVerificationEmail = '';
+
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const firstName = document.getElementById('regFirstName').value.trim();
+            const lastName = document.getElementById('regLastName').value.trim();
+            const tcNo = document.getElementById('regTc').value;
+            const email = document.getElementById('regEmail').value.trim();
+            const password = document.getElementById('regPassword').value;
+            const passwordConfirm = document.getElementById('regPasswordConfirm').value;
+            const btn = document.getElementById('registerBtn');
+
+            // Validations
+            if (password !== passwordConfirm) {
+                showAlert('Şifreler eşleşmiyor!');
+                return;
+            }
+            if (tcNo.length !== 11) {
+                showAlert('T.C. Kimlik numarası 11 haneli olmalıdır.');
+                return;
             }
 
-            if (!response.ok) throw new Error(data.message || 'Doğrulama başarısız.');
+            btn.disabled = true;
+            btn.innerHTML = `<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg> Kayıt Olunuyor...`;
 
-            // Yeni token'ı kaydet (emailVerified=true)
-            setToken(data.token);
-            showAlert('E-posta doğrulandı! Yönlendiriliyorsunuz...', 'success');
+            try {
+                const fullName = `${firstName} ${lastName}`;
+                const response = await fetch(`${API_BASE_URL}/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ fullName, email, password, tcNo, role: 'USER' })
+                });
 
-            const role = getUserRole();
-            setTimeout(() => {
-                if (role === 'ADMIN') window.location.href = 'admin.html';
-                else if (role === 'COMPANY') window.location.href = 'company.html';
-                else window.location.href = 'index.html';
-            }, 1500);
-        } catch (err) {
-            showAlert(err.message || 'Doğrulama başarısız.');
-            btn.disabled = false;
-            btn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> Doğrula`;
-        }
-    });
+                let data;
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) {
+                    data = await response.json();
+                } else {
+                    const text = await response.text();
+                    data = { message: text || 'Kayıt sırasında bir hata oluştu.' };
+                }
 
-    // ── RESEND CODE ──
-    document.getElementById('resendCodeBtn').addEventListener('click', async () => {
-        const btn = document.getElementById('resendCodeBtn');
-        btn.disabled = true;
-        btn.textContent = 'Gönderiliyor...';
+                if (!response.ok) throw new Error(data.message || 'Kayıt sırasında bir hata oluştu.');
 
-        try {
-            const response = await fetch(`${API_BASE_URL}/auth/resend-code`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: pendingVerificationEmail })
-            });
+                // Token'ı kaydet
+                setToken(data.token);
+                pendingVerificationEmail = email;
 
-            let data;
-            const contentType = response.headers.get('content-type');
-            if (contentType && contentType.includes('application/json')) {
-                data = await response.json();
-            } else {
-                data = { message: 'Kod gönderildi.' };
+                // Doğrulama formunu göster
+                registerForm.classList.add('hidden');
+                loginForm.classList.add('hidden');
+                document.getElementById('verifyForm').classList.remove('hidden');
+                document.getElementById('verifyForm').classList.add('form-animate');
+                document.getElementById('verifyEmailDisplay').textContent = email;
+                document.querySelector('.border-b-2').classList.add('hidden'); // Tab bar'ı gizle
+                alertBox.classList.add('hidden');
+                document.title = 'E-posta Doğrulama | OtoBilet';
+
+            } catch (err) {
+                showAlert(err.message || 'Bir hata oluştu.');
+                btn.disabled = false;
+                btn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg> Kayıt Ol`;
+            }
+        });
+
+        // ── EMAIL VERIFICATION ──
+        document.getElementById('verifyCode').addEventListener('input', function () {
+            this.value = this.value.replace(/\D/g, '').slice(0, 6);
+        });
+
+        document.getElementById('verifyBtn').addEventListener('click', async () => {
+            const code = document.getElementById('verifyCode').value.trim();
+            const btn = document.getElementById('verifyBtn');
+
+            if (code.length !== 6) {
+                showAlert('Lütfen 6 haneli doğrulama kodunu girin.');
+                return;
             }
 
-            if (!response.ok) throw new Error(data.message || 'Kod gönderilemedi.');
+            btn.disabled = true;
+            btn.innerHTML = `<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg> Doğrulanıyor...`;
 
-            showAlert('Yeni doğrulama kodu gönderildi!', 'success');
-        } catch (err) {
-            showAlert(err.message || 'Kod gönderilemedi.');
-        } finally {
-            btn.disabled = false;
-            btn.textContent = 'Kodu Tekrar Gönder';
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/verify-email`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: pendingVerificationEmail, code: code })
+                });
+
+                let data;
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) {
+                    data = await response.json();
+                } else {
+                    const text = await response.text();
+                    data = { message: text || 'Doğrulama sırasında bir hata oluştu.' };
+                }
+
+                if (!response.ok) throw new Error(data.message || 'Doğrulama başarısız.');
+
+                // Yeni token'ı kaydet (emailVerified=true)
+                setToken(data.token);
+                showAlert('E-posta doğrulandı! Yönlendiriliyorsunuz...', 'success');
+
+                const role = getUserRole();
+                setTimeout(() => {
+                    if (role === 'ADMIN') window.location.href = 'admin.html';
+                    else if (role === 'COMPANY') window.location.href = 'company.html';
+                    else window.location.href = 'index.html';
+                }, 1500);
+            } catch (err) {
+                showAlert(err.message || 'Doğrulama başarısız.');
+                btn.disabled = false;
+                btn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> Doğrula`;
+            }
+        });
+
+        // ── RESEND CODE ──
+        document.getElementById('resendCodeBtn').addEventListener('click', async () => {
+            const btn = document.getElementById('resendCodeBtn');
+            btn.disabled = true;
+            btn.textContent = 'Gönderiliyor...';
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/resend-code`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: pendingVerificationEmail })
+                });
+
+                let data;
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) {
+                    data = await response.json();
+                } else {
+                    data = { message: 'Kod gönderildi.' };
+                }
+
+                if (!response.ok) throw new Error(data.message || 'Kod gönderilemedi.');
+
+                showAlert('Yeni doğrulama kodu gönderildi!', 'success');
+            } catch (err) {
+                showAlert(err.message || 'Kod gönderilemedi.');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Kodu Tekrar Gönder';
+            }
+        });
+
+        // ── ŞİFRE SIFIRLAMA ──
+        let fpResetEmail = '';
+        let fpTimerInterval;
+
+        function startFpTimer(duration = 180) { // 3 dakika
+            clearInterval(fpTimerInterval);
+            const timerEl = document.getElementById('fpTimer');
+            const timerTextEl = document.getElementById('fpTimerText');
+            const resendBtn = document.getElementById('fpResendBtn');
+            
+            timerTextEl.classList.remove('hidden');
+            resendBtn.classList.add('hidden');
+            
+            let timer = duration;
+            fpTimerInterval = setInterval(() => {
+                let minutes = parseInt(timer / 60, 10);
+                let seconds = parseInt(timer % 60, 10);
+
+                minutes = minutes < 10 ? "0" + minutes : minutes;
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+
+                timerEl.textContent = minutes + ":" + seconds;
+
+                if (--timer < 0) {
+                    clearInterval(fpTimerInterval);
+                    timerTextEl.classList.add('hidden');
+                    resendBtn.classList.remove('hidden');
+                }
+            }, 1000);
         }
-    });
 
-    // ── ŞİFRE SIFIRLAMA ──
-    let fpResetEmail = '';
+        function showForgotPassword() {
+            // Önceki verileri temizle
+            document.getElementById('fpEmail').value = '';
+            document.getElementById('fpCode').value = '';
+            document.getElementById('fpNewPassword').value = '';
+            document.getElementById('fpConfirmPassword').value = '';
+            clearInterval(fpTimerInterval);
 
-    function showForgotPassword() {
-        document.getElementById('loginForm').classList.add('hidden');
-        document.getElementById('forgotPasswordSection').classList.remove('hidden');
-        document.getElementById('fpStep1').classList.remove('hidden');
-        document.getElementById('fpStep2').classList.add('hidden');
-        document.getElementById('fpStep3').classList.add('hidden');
-    }
-
-    function hideForgotPassword() {
-        document.getElementById('forgotPasswordSection').classList.add('hidden');
-        document.getElementById('loginForm').classList.remove('hidden');
-    }
-
-    async function sendResetCode() {
-        const email = document.getElementById('fpEmail').value.trim();
-        if (!email) { showAlert('E-posta adresinizi girin.'); return; }
-
-        const btn = document.getElementById('fpSendBtn');
-        btn.disabled = true;
-        btn.textContent = 'Gönderiliyor...';
-
-        try {
-            const res = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email })
-            });
-            const data = await res.json().catch(() => ({}));
-            if (!res.ok) throw new Error(data.message || 'Kod gönderilemedi.');
-
-            fpResetEmail = email;
-            showAlert('Sıfırlama kodu e-postanıza gönderildi!', 'success');
-            document.getElementById('fpStep1').classList.add('hidden');
-            document.getElementById('fpStep2').classList.remove('hidden');
-        } catch (err) {
-            showAlert(err.message);
-        } finally {
-            btn.disabled = false;
-            btn.textContent = 'Sıfırlama Kodu Gönder';
-        }
-    }
-
-    async function verifyResetCode() {
-        const code = document.getElementById('fpCode').value.trim();
-        if (code.length !== 6) { showAlert('6 haneli kodu girin.'); return; }
-
-        try {
-            const res = await fetch(`${API_BASE_URL}/auth/verify-reset-code`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: fpResetEmail, code })
-            });
-            const data = await res.json().catch(() => ({}));
-            if (!res.ok) throw new Error(data.message || 'Kod geçersiz.');
-
-            showAlert('Kod doğrulandı!', 'success');
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('registerForm').classList.add('hidden');
+            document.getElementById('authTabs').classList.add('hidden');
+            document.getElementById('forgotPasswordSection').classList.remove('hidden');
+            document.getElementById('fpStep1').classList.remove('hidden');
             document.getElementById('fpStep2').classList.add('hidden');
-            document.getElementById('fpStep3').classList.remove('hidden');
-        } catch (err) {
-            showAlert(err.message);
+            document.getElementById('fpStep3').classList.add('hidden');
         }
-    }
 
-    async function resetPassword() {
-        const newPassword = document.getElementById('fpNewPassword').value;
-        const confirmPassword = document.getElementById('fpConfirmPassword').value;
-        const code = document.getElementById('fpCode').value.trim();
-
-        if (newPassword.length < 6) { showAlert('Şifre en az 6 karakter olmalı.'); return; }
-        if (newPassword !== confirmPassword) { showAlert('Şifreler eşleşmiyor!'); return; }
-
-        try {
-            const res = await fetch(`${API_BASE_URL}/auth/reset-password`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: fpResetEmail, code, newPassword, confirmPassword })
-            });
-            const data = await res.json().catch(() => ({}));
-            if (!res.ok) throw new Error(data.message || 'Şifre değiştirilemedi.');
-
-            showAlert('Şifreniz başarıyla değiştirildi! Giriş yapabilirsiniz.', 'success');
-            hideForgotPassword();
-        } catch (err) {
-            showAlert(err.message);
+        function hideForgotPassword() {
+            document.getElementById('forgotPasswordSection').classList.add('hidden');
+            document.getElementById('authTabs').classList.remove('hidden');
+            document.getElementById('loginForm').classList.remove('hidden');
         }
-    }
+
+        async function sendResetCode() {
+            const email = document.getElementById('fpEmail').value.trim();
+            if (!email) { showAlert('E-posta adresinizi girin.'); return; }
+
+            const btn = document.getElementById('fpSendBtn');
+            btn.disabled = true;
+            btn.textContent = 'Gönderiliyor...';
+
+            try {
+                const res = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error(data.message || 'Kod gönderilemedi.');
+
+                fpResetEmail = email;
+                showAlert('Sıfırlama kodu e-postanıza gönderildi!', 'success');
+                document.getElementById('fpStep1').classList.add('hidden');
+                document.getElementById('fpStep2').classList.remove('hidden');
+                startFpTimer(); // Sayacı başlat
+            } catch (err) {
+                showAlert(err.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Sıfırlama Kodu Gönder';
+            }
+        }
+
+        async function verifyResetCode() {
+            const code = document.getElementById('fpCode').value.trim();
+            if (code.length !== 6) { showAlert('6 haneli kodu girin.'); return; }
+
+            try {
+                const res = await fetch(`${API_BASE_URL}/auth/verify-reset-code`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: fpResetEmail, code })
+                });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error(data.message || 'Kod geçersiz.');
+
+                showAlert('Kod doğrulandı!', 'success');
+                document.getElementById('fpStep2').classList.add('hidden');
+                document.getElementById('fpStep3').classList.remove('hidden');
+            } catch (err) {
+                showAlert(err.message);
+            }
+        }
+
+        async function resetPassword() {
+            const newPassword = document.getElementById('fpNewPassword').value;
+            const confirmPassword = document.getElementById('fpConfirmPassword').value;
+            const code = document.getElementById('fpCode').value.trim();
+
+            if (newPassword.length < 6) { showAlert('Şifre en az 6 karakter olmalı.'); return; }
+            if (newPassword !== confirmPassword) { showAlert('Şifreler eşleşmiyor!'); return; }
+
+            try {
+                const res = await fetch(`${API_BASE_URL}/auth/reset-password`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: fpResetEmail, code, newPassword, confirmPassword })
+                });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error(data.message || 'Şifre değiştirilemedi.');
+
+                showAlert('Şifreniz başarıyla değiştirildi! Giriş yapabilirsiniz.', 'success');
+                hideForgotPassword();
+            } catch (err) {
+                showAlert(err.message);
+            }
+        }
     </script>
 </body>
+
 </html>

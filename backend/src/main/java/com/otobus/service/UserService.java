@@ -314,6 +314,9 @@ public class UserService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Bu e-posta adresiyle kayıtlı kullanıcı bulunamadı."));
 
+        // Eski tokenleri sil (aynı anda sadece 1 geçerli kod olsun)
+        passwordResetTokenRepository.deleteByEmail(email);
+
         String code = generateVerificationCode();
 
         PasswordResetToken token = new PasswordResetToken();
