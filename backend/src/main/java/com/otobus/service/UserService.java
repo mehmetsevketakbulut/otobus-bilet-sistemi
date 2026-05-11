@@ -43,12 +43,12 @@ public class UserService {
     private final NotificationService notificationService;
 
     public UserService(UserRepository userRepository, CompanyRepository companyRepository,
-                       LoginAttemptRepository loginAttemptRepository,
-                       PasswordResetTokenRepository passwordResetTokenRepository,
-                       JwtUtil jwtUtil, PasswordEncoder passwordEncoder,
-                       AuthenticationManager authenticationManager,
-                       EmailService emailService, AuditLogService auditLogService,
-                       NotificationService notificationService) {
+            LoginAttemptRepository loginAttemptRepository,
+            PasswordResetTokenRepository passwordResetTokenRepository,
+            JwtUtil jwtUtil, PasswordEncoder passwordEncoder,
+            AuthenticationManager authenticationManager,
+            EmailService emailService, AuditLogService auditLogService,
+            NotificationService notificationService) {
         this.userRepository = userRepository;
         this.companyRepository = companyRepository;
         this.loginAttemptRepository = loginAttemptRepository;
@@ -90,7 +90,8 @@ public class UserService {
     }
 
     /**
-     * Brute-force kontrolü: Son 15 dakikada 5+ başarısız giriş varsa hesabı kilitler.
+     * Brute-force kontrolü: Son 15 dakikada 5+ başarısız giriş varsa hesabı
+     * kilitler.
      */
     private void checkBruteForce(String email) {
         LocalDateTime cutoff = LocalDateTime.now().minusMinutes(LOCKOUT_MINUTES);
@@ -100,7 +101,7 @@ public class UserService {
         if (recentFails.size() >= MAX_LOGIN_ATTEMPTS) {
             throw new RuntimeException(
                     "Çok fazla başarısız giriş denemesi. Hesabınız " + LOCKOUT_MINUTES +
-                    " dakika süreyle kilitlenmiştir. Lütfen daha sonra tekrar deneyin.");
+                            " dakika süreyle kilitlenmiştir. Lütfen daha sonra tekrar deneyin.");
         }
     }
 
@@ -120,7 +121,6 @@ public class UserService {
             throw new RuntimeException("Bu email zaten kayıtlı!");
         }
 
-        // Şifre gücü kontrolü
         validatePasswordStrength(request.getPassword());
 
         Role userRole = Role.USER;
@@ -132,7 +132,6 @@ public class UserService {
             }
         }
 
-        // Doğrulama kodu üret
         String verificationCode = generateVerificationCode();
 
         User user = User.builder()
@@ -146,9 +145,9 @@ public class UserService {
                 .verificationCodeExpiry(LocalDateTime.now().plusMinutes(10))
                 .build();
 
-        userRepository.save(user);
+        // 1. Önce kullanıcıyı kaydet ve DB'ye yazıldığından emin ol
+        user = userRepository.saveAndFlush(user);
 
-        // Firma rolü ise firma oluştur
         if (userRole == Role.COMPANY) {
             Company company = new Company();
             company.setName(request.getFullName() + " Firması");
@@ -156,18 +155,23 @@ public class UserService {
             companyRepository.save(company);
         }
 
-        // Doğrulama mailini gönder
+        // 2. LOG EKLEDİK: Terminalden takip edeceğiz
+        System.out.println("DEBUG: Kayıt başarılı, mail gönderimi tetikleniyor: " + user.getEmail());
+
         try {
+            // 3. Maili gönder
             emailService.sendVerificationEmail(user.getEmail(), verificationCode);
+            System.out.println("DEBUG: Mail başarıyla kuyruğa gönderildi.");
         } catch (Exception e) {
-            System.err.println("E-posta gönderilemedi: " + e.getMessage());
+            // 4. Hata varsa SAKLAMA, terminale dök ki nedenini görelim
+            System.err.println("!!! KRİTİK E-POSTA HATASI !!!");
+            System.err.println("Hata Mesajı: " + e.getMessage());
+            e.printStackTrace();
         }
 
-        // Audit log
         auditLogService.log(user, "CREATE", "User", user.getId(),
                 "Yeni kullanıcı kaydı: " + user.getEmail(), null);
 
-        // Hoş geldin bildirimi
         notificationService.createNotification(user, "Hoş Geldiniz!",
                 "OtoBilet'e hoş geldiniz. E-posta adresinizi doğrulamayı unutmayın.", "WELCOME");
 
