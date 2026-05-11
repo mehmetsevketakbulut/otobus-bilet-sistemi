@@ -13,6 +13,9 @@ public class Company {
     @Column(nullable = false, unique = true)
     private String name;
 
+    @Column(nullable = false)
+    private boolean active = true;
+
     @OneToOne
     @JoinColumn(name = "owner_id")
     private User owner;
@@ -31,6 +34,14 @@ public class Company {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
     public User getOwner() {

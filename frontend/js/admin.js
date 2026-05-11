@@ -110,6 +110,9 @@ function renderCompanies(data) {
         return;
     }
     tb.innerHTML = data.map(c => {
+        const isActive = c.active !== false;
+        const statusBg = isActive ? 'bg-emerald-500/15 text-emerald-400' : 'bg-red-500/15 text-red-400';
+        const statusText = isActive ? 'Aktif' : 'Pasif';
         return `<tr class="tbl-row border-b border-white/5">
             <td class="px-6 py-3.5"><div class="flex items-center gap-3">
                 <div class="w-9 h-9 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-400 font-bold text-xs">${(c.name || '').substring(0,2).toUpperCase()}</div>
@@ -119,7 +122,7 @@ function renderCompanies(data) {
             <td class="px-6 py-3.5 text-gray-400">${c.owner ? c.owner.fullName : '-'}</td>
             <td class="px-6 py-3.5 text-gray-500 text-xs">-</td>
             <td class="px-6 py-3.5">
-                <span class="px-2 py-0.5 text-[10px] font-bold rounded-md bg-emerald-500/15 text-emerald-400">Aktif</span>
+                <button onclick="toggleCompanyActive(${c.id})" class="px-2 py-0.5 text-[10px] font-bold rounded-md ${statusBg} cursor-pointer hover:opacity-80 transition">${statusText}</button>
             </td>
             <td class="px-6 py-3.5 text-right">
                 <button onclick="deleteCompany(${c.id})" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition cursor-pointer">Sil</button>
@@ -127,6 +130,12 @@ function renderCompanies(data) {
         </tr>`;
     }).join('');
 }
+
+window.toggleCompanyActive = (id) => {
+    adminFetch(`/admin/companies/${id}/toggle-active`, { method: 'PUT' })
+        .then(() => loadCompanies())
+        .catch(err => alert('Durum değiştirme hatası: ' + err.message));
+};
 
 window.deleteCompany = (id) => {
     if (!confirm('Bu firmayı silmek istediğinize emin misiniz?')) return;

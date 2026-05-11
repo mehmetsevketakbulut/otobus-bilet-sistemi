@@ -86,6 +86,18 @@ public class AdminController {
     }
 
     /**
+     * Firma aktif/pasif durumunu değiştirir (toggle).
+     */
+    @PutMapping("/companies/{id}/toggle-active")
+    public ResponseEntity<Company> toggleCompanyActive(@PathVariable Long id) {
+        Company company = companyRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Firma bulunamadı!"));
+        company.setActive(!company.isActive());
+        companyRepository.save(company);
+        return ResponseEntity.ok(company);
+    }
+
+    /**
      * Tüm kullanıcıları listeler.
      */
     @GetMapping("/users")

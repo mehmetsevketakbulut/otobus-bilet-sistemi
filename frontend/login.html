@@ -150,11 +150,70 @@
                         Giriş Yap
                     </button>
 
-                    <p class="text-center text-xs text-gray-400 lg:hidden mt-4">
-                        Hesabınız yok mu?
-                        <button type="button" onclick="switchTab('register')" class="text-brand-600 font-semibold hover:underline cursor-pointer">Kayıt Olun</button>
-                    </p>
+                    <div class="flex items-center justify-between">
+                        <p class="text-xs text-gray-400 lg:hidden">
+                            Hesabınız yok mu?
+                            <button type="button" onclick="switchTab('register')" class="text-brand-600 font-semibold hover:underline cursor-pointer">Kayıt Olun</button>
+                        </p>
+                        <button type="button" onclick="showForgotPassword()" class="text-xs text-navy-600 font-semibold hover:underline cursor-pointer">Şifremi Unuttum</button>
+                    </div>
                 </form>
+
+                <!-- ═══ FORGOT PASSWORD FORM ═══ -->
+                <div id="forgotPasswordSection" class="hidden space-y-4">
+                    <!-- Step 1: Email gir -->
+                    <div id="fpStep1" class="space-y-4">
+                        <div class="text-center mb-2">
+                            <div class="w-14 h-14 bg-navy-50 rounded-full flex items-center justify-center mx-auto mb-3">
+                                <svg class="w-7 h-7 text-navy-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+                            </div>
+                            <h3 class="text-base font-bold text-navy-800">Şifre Sıfırlama</h3>
+                            <p class="text-xs text-gray-400 mt-1">E-posta adresinize bir doğrulama kodu göndereceğiz.</p>
+                        </div>
+                        <div class="relative">
+                            <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                            <input type="email" id="fpEmail" required placeholder="E-posta adresiniz"
+                                class="profile-input w-full pl-11 pr-4 py-3.5 border-2 border-gray-200 rounded-xl text-sm text-navy-800 outline-none bg-gray-50/50">
+                        </div>
+                        <button type="button" id="fpSendBtn" onclick="sendResetCode()"
+                            class="auth-btn w-full py-3.5 bg-gradient-to-r from-navy-700 to-navy-800 hover:from-navy-800 hover:to-navy-900 text-white font-bold text-sm rounded-xl shadow-lg cursor-pointer flex items-center justify-center gap-2">
+                            Sıfırlama Kodu Gönder
+                        </button>
+                    </div>
+
+                    <!-- Step 2: Kod doğrula -->
+                    <div id="fpStep2" class="hidden space-y-4">
+                        <div class="text-center mb-2">
+                            <h3 class="text-base font-bold text-navy-800">Kodu Doğrulayın</h3>
+                            <p class="text-xs text-gray-400 mt-1">E-postanıza gelen 6 haneli kodu girin.</p>
+                        </div>
+                        <input type="text" id="fpCode" maxlength="6" placeholder="6 haneli kod"
+                            class="profile-input w-full text-center text-2xl tracking-[0.5em] py-3.5 border-2 border-gray-200 rounded-xl text-navy-800 outline-none bg-gray-50/50 font-bold">
+                        <button type="button" onclick="verifyResetCode()"
+                            class="auth-btn w-full py-3.5 bg-gradient-to-r from-navy-700 to-navy-800 text-white font-bold text-sm rounded-xl shadow-lg cursor-pointer">
+                            Kodu Doğrula
+                        </button>
+                    </div>
+
+                    <!-- Step 3: Yeni şifre -->
+                    <div id="fpStep3" class="hidden space-y-4">
+                        <div class="text-center mb-2">
+                            <h3 class="text-base font-bold text-navy-800">Yeni Şifre Belirleyin</h3>
+                        </div>
+                        <input type="password" id="fpNewPassword" placeholder="Yeni şifre" minlength="6"
+                            class="profile-input w-full px-4 py-3.5 border-2 border-gray-200 rounded-xl text-sm text-navy-800 outline-none bg-gray-50/50">
+                        <input type="password" id="fpConfirmPassword" placeholder="Şifre tekrar" minlength="6"
+                            class="profile-input w-full px-4 py-3.5 border-2 border-gray-200 rounded-xl text-sm text-navy-800 outline-none bg-gray-50/50">
+                        <button type="button" onclick="resetPassword()"
+                            class="auth-btn w-full py-3.5 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white font-bold text-sm rounded-xl shadow-lg cursor-pointer">
+                            Şifreyi Değiştir
+                        </button>
+                    </div>
+
+                    <button type="button" onclick="hideForgotPassword()" class="w-full text-center text-xs text-gray-400 hover:text-navy-600 transition cursor-pointer mt-2">
+                        ← Giriş ekranına dön
+                    </button>
+                </div>
 
                 <!-- ═══ REGISTER FORM ═══ -->
                 <form id="registerForm" class="hidden space-y-4">
@@ -536,6 +595,96 @@
             btn.textContent = 'Kodu Tekrar Gönder';
         }
     });
+
+    // ── ŞİFRE SIFIRLAMA ──
+    let fpResetEmail = '';
+
+    function showForgotPassword() {
+        document.getElementById('loginForm').classList.add('hidden');
+        document.getElementById('forgotPasswordSection').classList.remove('hidden');
+        document.getElementById('fpStep1').classList.remove('hidden');
+        document.getElementById('fpStep2').classList.add('hidden');
+        document.getElementById('fpStep3').classList.add('hidden');
+    }
+
+    function hideForgotPassword() {
+        document.getElementById('forgotPasswordSection').classList.add('hidden');
+        document.getElementById('loginForm').classList.remove('hidden');
+    }
+
+    async function sendResetCode() {
+        const email = document.getElementById('fpEmail').value.trim();
+        if (!email) { showAlert('E-posta adresinizi girin.'); return; }
+
+        const btn = document.getElementById('fpSendBtn');
+        btn.disabled = true;
+        btn.textContent = 'Gönderiliyor...';
+
+        try {
+            const res = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email })
+            });
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) throw new Error(data.message || 'Kod gönderilemedi.');
+
+            fpResetEmail = email;
+            showAlert('Sıfırlama kodu e-postanıza gönderildi!', 'success');
+            document.getElementById('fpStep1').classList.add('hidden');
+            document.getElementById('fpStep2').classList.remove('hidden');
+        } catch (err) {
+            showAlert(err.message);
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Sıfırlama Kodu Gönder';
+        }
+    }
+
+    async function verifyResetCode() {
+        const code = document.getElementById('fpCode').value.trim();
+        if (code.length !== 6) { showAlert('6 haneli kodu girin.'); return; }
+
+        try {
+            const res = await fetch(`${API_BASE_URL}/auth/verify-reset-code`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: fpResetEmail, code })
+            });
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) throw new Error(data.message || 'Kod geçersiz.');
+
+            showAlert('Kod doğrulandı!', 'success');
+            document.getElementById('fpStep2').classList.add('hidden');
+            document.getElementById('fpStep3').classList.remove('hidden');
+        } catch (err) {
+            showAlert(err.message);
+        }
+    }
+
+    async function resetPassword() {
+        const newPassword = document.getElementById('fpNewPassword').value;
+        const confirmPassword = document.getElementById('fpConfirmPassword').value;
+        const code = document.getElementById('fpCode').value.trim();
+
+        if (newPassword.length < 6) { showAlert('Şifre en az 6 karakter olmalı.'); return; }
+        if (newPassword !== confirmPassword) { showAlert('Şifreler eşleşmiyor!'); return; }
+
+        try {
+            const res = await fetch(`${API_BASE_URL}/auth/reset-password`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: fpResetEmail, code, newPassword, confirmPassword })
+            });
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) throw new Error(data.message || 'Şifre değiştirilemedi.');
+
+            showAlert('Şifreniz başarıyla değiştirildi! Giriş yapabilirsiniz.', 'success');
+            hideForgotPassword();
+        } catch (err) {
+            showAlert(err.message);
+        }
+    }
     </script>
 </body>
 </html>
