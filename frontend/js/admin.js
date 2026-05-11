@@ -36,9 +36,10 @@ document.addEventListener('DOMContentLoaded', () => {
     loadUsers();
     loadTerminals();
     loadAuditLogs();
+    loadBuses();
 
     // ── Sidebar Nav ──
-    const pages = { dashboard:'Gösterge Paneli', companies:'Firmalar', pendingTrips:'Sefer Talepleri', users:'Kullanıcılar', terminals:'Terminaller', logs:'İşlem Logları', settings:'Sistem Ayarları' };
+    const pages = { dashboard:'Gösterge Paneli', companies:'Firmalar', pendingTrips:'Sefer Talepleri', users:'Kullanıcılar', terminals:'Terminaller', buses:'Otobüsler', logs:'İşlem Logları', settings:'Sistem Ayarları' };
     document.querySelectorAll('.sb-link').forEach(btn => {
         btn.addEventListener('click', () => {
             const pg = btn.dataset.page;
@@ -343,3 +344,63 @@ window.rejectTrip = (id) => {
         })
         .catch(err => alert('Reddetme hatası: ' + err.message));
 };
+
+// ── Otobüsler ──
+function loadBuses() {
+    adminFetch('/buses').then(buses => {
+        const tb = document.getElementById('busTable');
+        if (!tb) return;
+        if (!buses.length) {
+            tb.innerHTML = '<tr><td colspan="4" class="px-6 py-8 text-center text-gray-600">Kayıtlı otobüs bulunamadı.</td></tr>';
+            return;
+        }
+        tb.innerHTML = buses.map(b => `
+            <tr class="tbl-row border-b border-white/5">
+                <td class="px-6 py-3 font-semibold text-white">${b.plate}</td>
+                <td class="px-6 py-3 text-gray-400">${b.seatCapacity} koltuk</td>
+                <td class="px-6 py-3 text-gray-400">${b.company ? b.company.name : '-'}</td>
+                <td class="px-6 py-3 text-right">
+                    <button onclick="removeBus(${b.id})" class="p-1.5 rounded-lg hover:bg-red-500/10 text-gray-600 hover:text-red-400 transition cursor-pointer">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    </button>
+                </td>
+            </tr>`).join('');
+    }).catch(err => console.error('Otobüsler yüklenemedi:', err));
+
+    // Firma dropdown'u doldur
+    adminFetch('/companies').then(companies => {
+        const sel = document.getElementById('busCompany');
+        if (!sel) return;
+        const current = sel.innerHTML;
+        if (current.includes('value="1"')) return;
+        companies.forEach(c => {
+            sel.innerHTML += `<option value="${c.id}">${c.name}</option>`;
+        });
+    }).catch(() => {});
+}
+
+window.removeBus = (id) => {
+    if (!confirm('Bu otobüsü silmek istediğinize emin misiniz?')) return;
+    adminFetch(`/buses/${id}`, { method: 'DELETE' })
+        .then(() => loadBuses())
+        .catch(err => alert('Silme hatası: ' + err.message));
+};
+
+// Otobüs ekleme formu
+const busForm = document.getElementById('busForm');
+if (busForm) {
+    busForm.addEventListener('submit', e => {
+        e.preventDefault();
+        const plate = document.getElementById('busPlate').value.trim();
+        const cap = parseInt(document.getElementById('busCap').value);
+        const companyId = parseInt(document.getElementById('busCompany').value);
+
+        adminFetch('/buses', {
+            method: 'POST',
+            body: JSON.stringify({ plate, seatCapacity: cap, company: { id: companyId } })
+        }).then(() => {
+            loadBuses();
+            e.target.reset();
+        }).catch(err => alert('Otobüs eklenirken hata: ' + err.message));
+    });
+}

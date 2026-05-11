@@ -59,6 +59,10 @@
             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
             Terminaller
         </button>
+        <button data-page="buses" class="sb-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-500 cursor-pointer">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M8 7h8m-8 4h8m-4 4v3m-6-3h12a2 2 0 002-2V5a2 2 0 00-2-2H6a2 2 0 00-2 2v8a2 2 0 002 2zm-2 3h16"/></svg>
+            Otobüsler
+        </button>
         <button data-page="logs" class="sb-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-500 cursor-pointer">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
             İşlem Logları
@@ -197,6 +201,39 @@
                             <th class="px-6 py-3">Şehir</th><th class="px-6 py-3">Otogar</th><th class="px-6 py-3 text-right">Sil</th>
                         </tr></thead>
                         <tbody id="termTable"></tbody>
+                    </table></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BUSES -->
+        <div id="pgBuses" class="hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="bg-dark-850 rounded-2xl border border-white/5 p-6 anim">
+                    <h2 class="text-base font-bold text-white mb-4">Yeni Otobüs Ekle</h2>
+                    <form id="busForm" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 mb-1">Plaka *</label>
+                            <input type="text" id="busPlate" required placeholder="Örn: 34 KK 001" class="input-a w-full px-3 py-2.5 rounded-xl text-sm outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 mb-1">Koltuk Kapasitesi *</label>
+                            <input type="number" id="busCap" required min="1" max="60" placeholder="Örn: 40" class="input-a w-full px-3 py-2.5 rounded-xl text-sm outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 mb-1">Firma *</label>
+                            <select id="busCompany" required class="input-a w-full px-3 py-2.5 rounded-xl text-sm outline-none"><option value="" disabled selected>Firma seçin</option></select>
+                        </div>
+                        <button type="submit" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-xl cursor-pointer transition">Ekle</button>
+                    </form>
+                </div>
+                <div class="lg:col-span-2 bg-dark-850 rounded-2xl border border-white/5 overflow-hidden anim" style="animation-delay:.1s">
+                    <div class="px-6 py-4 border-b border-white/5"><h2 class="text-base font-bold text-white">Kayıtlı Otobüsler</h2></div>
+                    <div class="overflow-x-auto"><table class="w-full text-sm">
+                        <thead><tr class="text-left text-[11px] font-semibold text-gray-600 uppercase tracking-wider border-b border-white/5">
+                            <th class="px-6 py-3">Plaka</th><th class="px-6 py-3">Kapasite</th><th class="px-6 py-3">Firma</th><th class="px-6 py-3 text-right">Sil</th>
+                        </tr></thead>
+                        <tbody id="busTable"></tbody>
                     </table></div>
                 </div>
             </div>

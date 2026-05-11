@@ -404,6 +404,162 @@ document.addEventListener('DOMContentLoaded', async () => {
         localStorage.removeItem('jwt_token');
         window.location.href = 'login.html';
     });
+
+    // ══════════════════════════════════════════
+    // ═══ SEFERLERIM PAGE ═══
+    // ══════════════════════════════════════════
+    async function loadMyTrips() {
+        try {
+            const allTrips = await fetchApi('/trips/admin/pending');
+            const companyTrips = allTrips || [];
+            renderMyTrips(companyTrips);
+        } catch (e) {
+            renderMyTrips([]);
+        }
+    }
+
+    function renderMyTrips(data) {
+        const tbody = document.getElementById('myTripsTableBody');
+        if (!tbody) return;
+        if (!data || !data.length) {
+            tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-8 text-center text-gray-400 text-sm">Henüz sefer bulunmuyor.</td></tr>';
+            return;
+        }
+        tbody.innerHTML = data.map(t => {
+            const fromName = t.kalkisTerminali?.city?.name || t.kalkisTerminali?.name || '-';
+            const toName = t.varisTerminali?.city?.name || t.varisTerminali?.name || '-';
+            const busPlate = t.otobus?.plate || '-';
+            const seatCap = t.otobus?.seatCapacity || '-';
+            const price = t.fiyat || 0;
+            const dateStr = t.kalkisSaati ? new Date(t.kalkisSaati).toLocaleString('tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '-';
+            const statusBadge = t.approved
+                ? '<span class="px-2 py-0.5 text-[10px] font-bold rounded-md bg-emerald-50 text-emerald-700">Onaylandı</span>'
+                : '<span class="px-2 py-0.5 text-[10px] font-bold rounded-md bg-amber-50 text-amber-600">Onay Bekliyor</span>';
+
+            let stopsHtml = '';
+            if (t.stops && t.stops.length > 0) {
+                const sorted = [...t.stops].sort((a, b) => a.stopOrder - b.stopOrder);
+                stopsHtml = sorted.map((s, i) => {
+                    const sName = s.terminal?.city?.name || s.terminal?.name || '?';
+                    const icon = i === 0 ? '🚀' : i === sorted.length - 1 ? '🏁' : '🚏';
+                    return `<span class="text-[10px] bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded">${icon} ${sName}</span>`;
+                }).join(' → ');
+            }
+
+            return `
+            <tr class="table-row border-b border-gray-50">
+                <td class="px-6 py-3.5">
+                    <div class="flex items-center gap-2">
+                        <span class="font-bold text-navy-800">${fromName}</span>
+                        <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                        <span class="font-bold text-navy-800">${toName}</span>
+                    </div>
+                </td>
+                <td class="px-6 py-3.5"><div class="flex flex-wrap gap-1 max-w-xs">${stopsHtml || '<span class="text-gray-400 text-xs">—</span>'}</div></td>
+                <td class="px-6 py-3.5 text-gray-600">${dateStr}</td>
+                <td class="px-6 py-3.5"><span class="text-xs bg-gray-100 px-2 py-0.5 rounded-md font-medium text-gray-600">${busPlate} · ${seatCap}</span></td>
+                <td class="px-6 py-3.5 font-bold text-navy-800">${price} ₺</td>
+                <td class="px-6 py-3.5">${statusBadge}</td>
+                <td class="px-6 py-3.5 text-right">
+                    ${!t.approved ? `<button onclick="deleteMyTrip(${t.id})" class="px-2 py-1 text-xs rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition cursor-pointer">İptal Et</button>` : '<span class="text-gray-300 text-xs">—</span>'}
+                </td>
+            </tr>`;
+        }).join('');
+    }
+
+    // Trip filter
+    const tripFilter = document.getElementById('tripFilterStatus');
+    if (tripFilter) {
+        tripFilter.addEventListener('change', async () => {
+            const allTrips = await fetchApi('/trips/admin/pending').catch(() => []) || [];
+            const val = tripFilter.value;
+            if (val === 'approved') renderMyTrips(allTrips.filter(t => t.approved));
+            else if (val === 'pending') renderMyTrips(allTrips.filter(t => !t.approved));
+            else renderMyTrips(allTrips);
+        });
+    }
+
+    // ══════════════════════════════════════════
+    // ═══ OTOBÜSLERİM PAGE ═══
+    // ══════════════════════════════════════════
+    async function loadMyBuses() {
+        try {
+            const allBuses = await fetchApi('/buses');
+            renderMyBuses(allBuses || []);
+        } catch (e) {
+            renderMyBuses([]);
+        }
+    }
+
+    function renderMyBuses(data) {
+        const tbody = document.getElementById('myBusesTableBody');
+        if (!tbody) return;
+        if (!data || !data.length) {
+            tbody.innerHTML = '<tr><td colspan="3" class="px-6 py-8 text-center text-gray-400 text-sm">Kayıtlı otobüs bulunamadı.</td></tr>';
+            return;
+        }
+        tbody.innerHTML = data.map(b => `
+            <tr class="table-row border-b border-gray-50">
+                <td class="px-6 py-3 font-semibold text-navy-800">${b.plate}</td>
+                <td class="px-6 py-3 text-gray-600">${b.seatCapacity} koltuk</td>
+                <td class="px-6 py-3 text-right">
+                    <button onclick="deleteMyBus(${b.id})" class="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500 transition cursor-pointer">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    </button>
+                </td>
+            </tr>`).join('');
+    }
+
+    // Bus form
+    const cBusForm = document.getElementById('companyBusForm');
+    if (cBusForm) {
+        cBusForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const plate = document.getElementById('cBusPlate').value.trim();
+            const cap = parseInt(document.getElementById('cBusCap').value);
+            try {
+                await fetchApi('/buses', {
+                    method: 'POST',
+                    body: JSON.stringify({ plate, seatCapacity: cap })
+                });
+                loadMyBuses();
+                // Refresh the bus dropdown in the modal too
+                buses = await fetchApi('/buses');
+                const busSel2 = document.getElementById('modalBus');
+                busSel2.innerHTML = '<option value="" disabled selected>Otobüs seçin</option>';
+                buses.forEach(b => { busSel2.innerHTML += `<option value="${b.id}">${b.plate} — ${b.seatCapacity} Koltuk</option>`; });
+                e.target.reset();
+            } catch (err) {
+                alert('Otobüs eklenirken hata: ' + (err.message || err));
+            }
+        });
+    }
+
+    // ══════════════════════════════════════════
+    // ═══ RAPORLAR PAGE ═══
+    // ══════════════════════════════════════════
+    async function loadReports() {
+        try {
+            const allTrips = await fetchApi('/trips/admin/pending').catch(() => []) || [];
+            const allBuses = await fetchApi('/buses').catch(() => []) || [];
+            const rptTrips = document.getElementById('rptTotalTrips');
+            const rptBuses = document.getElementById('rptTotalBuses');
+            const rptTickets = document.getElementById('rptTotalTickets');
+            if (rptTrips) rptTrips.textContent = allTrips.length;
+            if (rptBuses) rptBuses.textContent = allBuses.length;
+            if (rptTickets) rptTickets.textContent = '—';
+        } catch (e) { /* ignore */ }
+    }
+
+    // ── Load sub-pages on sidebar click ──
+    document.querySelectorAll('.sidebar-link').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const pg = btn.dataset.page;
+            if (pg === 'trips') loadMyTrips();
+            if (pg === 'buses') loadMyBuses();
+            if (pg === 'reports') loadReports();
+        });
+    });
 });
 
 // ── Global helpers ──
@@ -417,3 +573,24 @@ function toggleSidebar() {
 function closeModal() {
     document.getElementById('tripModal').classList.add('hidden');
 }
+
+window.deleteMyTrip = async (id) => {
+    if (!confirm('Bu seferi iptal etmek istediğinize emin misiniz?')) return;
+    try {
+        await fetchApi(`/trips/admin/reject/${id}`, { method: 'DELETE' });
+        alert('Sefer iptal edildi.');
+        location.reload();
+    } catch (err) {
+        alert('Hata: ' + err.message);
+    }
+};
+
+window.deleteMyBus = async (id) => {
+    if (!confirm('Bu otobüsü silmek istediğinize emin misiniz?')) return;
+    try {
+        await fetchApi(`/buses/${id}`, { method: 'DELETE' });
+        location.reload();
+    } catch (err) {
+        alert('Hata: ' + err.message);
+    }
+};
