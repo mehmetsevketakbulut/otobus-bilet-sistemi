@@ -210,11 +210,12 @@ public class TicketService {
             }
         }
 
-        // Ödeme iadesi
+        // Önce ödeme kaydını sil (FK constraint yüzünden bilet silinmeden önce)
         try {
-            paymentService.refundPayment(ticketId);
+            paymentService.deletePaymentByTicketId(ticketId);
         } catch (Exception e) {
             // Ödeme kaydı yoksa da iptal devam etsin
+            System.err.println("Ödeme kaydı silinemedi: " + e.getMessage());
         }
 
         ticketRepository.deleteById(ticketId);

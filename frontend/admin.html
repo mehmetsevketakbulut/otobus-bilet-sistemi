@@ -244,7 +244,13 @@
             <div class="bg-dark-850 rounded-2xl border border-white/5 overflow-hidden anim">
                 <div class="px-6 py-4 border-b border-white/5 flex items-center justify-between">
                     <h2 class="text-base font-bold text-white">İşlem Logları</h2>
-                    <span class="text-xs text-gray-600">Son 50 kayıt</span>
+                    <div class="flex items-center gap-3">
+                        <span class="text-xs text-gray-600">Son 50 kayıt</span>
+                        <button onclick="clearAllLogs()" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition cursor-pointer flex items-center gap-1">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                            Logları Temizle
+                        </button>
+                    </div>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm">

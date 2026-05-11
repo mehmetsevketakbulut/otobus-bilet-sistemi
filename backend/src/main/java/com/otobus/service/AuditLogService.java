@@ -62,4 +62,11 @@ public class AuditLogService {
     public List<AuditLog> getAllLogs() {
         return auditLogRepository.findAll();
     }
+
+    /**
+     * Tüm logları temizler (sadece ADMIN kullanabilir).
+     */
+    public void clearAllLogs() {
+        auditLogRepository.deleteAll();
+    }
 }

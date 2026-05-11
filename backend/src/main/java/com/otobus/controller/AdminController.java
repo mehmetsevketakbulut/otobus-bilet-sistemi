@@ -136,4 +136,13 @@ public class AdminController {
     public ResponseEntity<List<AuditLog>> getAllAuditLogs() {
         return ResponseEntity.ok(auditLogService.getAllLogs());
     }
+
+    /**
+     * Tüm audit log'ları temizler.
+     */
+    @DeleteMapping("/audit-logs/clear")
+    public ResponseEntity<Map<String, String>> clearAuditLogs() {
+        auditLogService.clearAllLogs();
+        return ResponseEntity.ok(Map.of("message", "Tüm loglar başarıyla temizlendi."));
+    }
 }

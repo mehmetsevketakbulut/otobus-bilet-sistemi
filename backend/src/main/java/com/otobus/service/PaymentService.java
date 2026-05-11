@@ -47,6 +47,13 @@ public class PaymentService {
         return paymentRepository.save(payment);
     }
 
+    /**
+     * Bilet iptalinde ödeme kaydını siler (FK constraint için).
+     */
+    public void deletePaymentByTicketId(Long ticketId) {
+        paymentRepository.findByTicketId(ticketId).ifPresent(paymentRepository::delete);
+    }
+
     public List<Payment> getUserPayments(Long userId) {
         return paymentRepository.findByUserId(userId);
     }

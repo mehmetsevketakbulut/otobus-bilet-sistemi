@@ -243,6 +243,19 @@ function loadAuditLogs() {
     }).catch(err => console.error('Loglar yüklenemedi:', err));
 }
 
+function clearAllLogs() {
+    if (!confirm('Tüm işlem loglarını silmek istediğinize emin misiniz? Bu işlem geri alınamaz!')) return;
+    adminFetch('/admin/audit-logs/clear', { method: 'DELETE' })
+        .then(() => {
+            loadAuditLogs();
+            alert('Tüm loglar başarıyla temizlendi.');
+        })
+        .catch(err => {
+            console.error('Loglar temizlenemedi:', err);
+            alert('Loglar temizlenirken hata oluştu.');
+        });
+}
+
 function toggleSB() {
     document.getElementById('sidebar').classList.toggle('-translate-x-full');
     document.getElementById('sbOverlay').classList.toggle('hidden');
