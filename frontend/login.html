@@ -138,6 +138,12 @@
                         </div>
                     </div>
 
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" id="rememberMe"
+                            class="w-4 h-4 rounded border-gray-300 text-navy-600 focus:ring-navy-500 cursor-pointer accent-navy-700">
+                        <label for="rememberMe" class="text-xs font-medium text-gray-500 cursor-pointer select-none">Beni Hatırla</label>
+                    </div>
+
                     <button type="submit" id="loginBtn"
                         class="auth-btn w-full py-3.5 bg-gradient-to-r from-navy-700 to-navy-800 hover:from-navy-800 hover:to-navy-900 text-white font-bold text-sm rounded-xl shadow-lg cursor-pointer flex items-center justify-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
@@ -213,6 +219,39 @@
                     </p>
                 </form>
 
+                <!-- ═══ EMAIL VERIFICATION FORM ═══ -->
+                <div id="verifyForm" class="hidden space-y-5">
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-emerald-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                        </div>
+                        <h2 class="text-2xl font-extrabold text-navy-800 mb-1">E-posta Doğrulama 📧</h2>
+                        <p class="text-sm text-gray-500"><span id="verifyEmailDisplay" class="font-semibold text-navy-700"></span> adresine gönderilen 6 haneli kodu girin</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1.5">Doğrulama Kodu</label>
+                        <div class="flex gap-2 justify-center">
+                            <input type="text" id="verifyCode" maxlength="6" required placeholder="______"
+                                class="input-field w-48 text-center px-4 py-4 border-2 border-gray-200 rounded-xl text-2xl font-mono tracking-[0.5em] text-navy-800 outline-none bg-gray-50/50 font-bold">
+                        </div>
+                    </div>
+
+                    <button type="button" id="verifyBtn"
+                        class="auth-btn w-full py-3.5 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold text-sm rounded-xl shadow-lg cursor-pointer flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        Doğrula
+                    </button>
+
+                    <div class="text-center">
+                        <p class="text-xs text-gray-400 mb-2">Kod gelmedi mi?</p>
+                        <button type="button" id="resendCodeBtn"
+                            class="text-xs font-semibold text-brand-600 hover:text-brand-700 hover:underline cursor-pointer transition">
+                            Kodu Tekrar Gönder
+                        </button>
+                    </div>
+                </div>
+
                 <!-- Footer -->
                 <p class="text-center text-[10px] text-gray-300 mt-8">
                     © 2026 OtoBilet. Giriş yaparak
@@ -259,6 +298,13 @@
 
     // Auto-switch if URL has hash
     if (window.location.hash === '#register') switchTab('register');
+
+    // ── BENI HATIRLA: Kayıtlı email varsa yükle ──
+    const savedEmail = localStorage.getItem('remembered_email');
+    if (savedEmail) {
+        document.getElementById('loginEmail').value = savedEmail;
+        document.getElementById('rememberMe').checked = true;
+    }
 
     // ── ALERT ──
     function showAlert(message, type = 'error') {
@@ -316,6 +362,15 @@
 
             // Save JWT token
             setToken(data.token);
+
+            // Beni Hatırla
+            const rememberMe = document.getElementById('rememberMe').checked;
+            if (rememberMe) {
+                localStorage.setItem('remembered_email', email);
+            } else {
+                localStorage.removeItem('remembered_email');
+            }
+
             showAlert('Giriş başarılı! Yönlendiriliyorsunuz...', 'success');
 
             const role = getUserRole();
@@ -332,6 +387,8 @@
     });
 
     // ── REGISTER SUBMIT ──
+    let pendingVerificationEmail = '';
+
     registerForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const firstName = document.getElementById('regFirstName').value.trim();
@@ -374,14 +431,108 @@
 
             if (!response.ok) throw new Error(data.message || 'Kayıt sırasında bir hata oluştu.');
 
+            // Token'ı kaydet
             setToken(data.token);
-            showAlert('Kayıt başarılı! Yönlendiriliyorsunuz...', 'success');
+            pendingVerificationEmail = email;
 
-            setTimeout(() => { window.location.href = 'index.html'; }, 1000);
+            // Doğrulama formunu göster
+            registerForm.classList.add('hidden');
+            loginForm.classList.add('hidden');
+            document.getElementById('verifyForm').classList.remove('hidden');
+            document.getElementById('verifyForm').classList.add('form-animate');
+            document.getElementById('verifyEmailDisplay').textContent = email;
+            document.querySelector('.border-b-2').classList.add('hidden'); // Tab bar'ı gizle
+            alertBox.classList.add('hidden');
+            document.title = 'E-posta Doğrulama | OtoBilet';
+
         } catch (err) {
             showAlert(err.message || 'Bir hata oluştu.');
             btn.disabled = false;
             btn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg> Kayıt Ol`;
+        }
+    });
+
+    // ── EMAIL VERIFICATION ──
+    document.getElementById('verifyCode').addEventListener('input', function() {
+        this.value = this.value.replace(/\D/g, '').slice(0, 6);
+    });
+
+    document.getElementById('verifyBtn').addEventListener('click', async () => {
+        const code = document.getElementById('verifyCode').value.trim();
+        const btn = document.getElementById('verifyBtn');
+
+        if (code.length !== 6) {
+            showAlert('Lütfen 6 haneli doğrulama kodunu girin.');
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = `<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg> Doğrulanıyor...`;
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/auth/verify-email`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: pendingVerificationEmail, code: code })
+            });
+
+            let data;
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+                data = await response.json();
+            } else {
+                const text = await response.text();
+                data = { message: text || 'Doğrulama sırasında bir hata oluştu.' };
+            }
+
+            if (!response.ok) throw new Error(data.message || 'Doğrulama başarısız.');
+
+            // Yeni token'ı kaydet (emailVerified=true)
+            setToken(data.token);
+            showAlert('E-posta doğrulandı! Yönlendiriliyorsunuz...', 'success');
+
+            const role = getUserRole();
+            setTimeout(() => {
+                if (role === 'ADMIN') window.location.href = 'admin.html';
+                else if (role === 'COMPANY') window.location.href = 'company.html';
+                else window.location.href = 'index.html';
+            }, 1500);
+        } catch (err) {
+            showAlert(err.message || 'Doğrulama başarısız.');
+            btn.disabled = false;
+            btn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> Doğrula`;
+        }
+    });
+
+    // ── RESEND CODE ──
+    document.getElementById('resendCodeBtn').addEventListener('click', async () => {
+        const btn = document.getElementById('resendCodeBtn');
+        btn.disabled = true;
+        btn.textContent = 'Gönderiliyor...';
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/auth/resend-code`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: pendingVerificationEmail })
+            });
+
+            let data;
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+                data = await response.json();
+            } else {
+                data = { message: 'Kod gönderildi.' };
+            }
+
+            if (!response.ok) throw new Error(data.message || 'Kod gönderilemedi.');
+
+            showAlert('Yeni doğrulama kodu gönderildi!', 'success');
+        } catch (err) {
+            showAlert(err.message || 'Kod gönderilemedi.');
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Kodu Tekrar Gönder';
         }
     });
     </script>

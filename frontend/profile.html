@@ -171,6 +171,35 @@
             </form>
         </div>
 
+        <!-- Biletlerim Section -->
+        <div class="mt-6 bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8 animate-in" style="animation-delay:0.45s">
+            <div class="flex items-center justify-between mb-5">
+                <h2 class="text-lg font-bold text-navy-800 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-brand-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/></svg>
+                    Biletlerim
+                </h2>
+                <button id="refreshTicketsBtn" class="text-xs font-semibold text-navy-600 hover:text-brand-600 transition flex items-center gap-1 cursor-pointer">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h5M20 20v-5h-5M20.49 9A9 9 0 005.64 5.64L4 4m16 16l-1.64-1.64A9 9 0 014.51 15"/></svg>
+                    Yenile
+                </button>
+            </div>
+
+            <div id="ticketsLoading" class="space-y-3">
+                <div class="skeleton-text w-full h-16 rounded-xl"></div>
+                <div class="skeleton-text w-full h-16 rounded-xl"></div>
+            </div>
+
+            <div id="ticketsEmpty" class="hidden text-center py-8">
+                <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/></svg>
+                </div>
+                <p class="text-sm text-gray-400 font-medium">Henüz biletiniz bulunmuyor</p>
+                <a href="index.html" class="inline-block mt-3 text-xs font-semibold text-brand-600 hover:text-brand-700 transition">Hemen bilet alın →</a>
+            </div>
+
+            <div id="ticketsList" class="hidden space-y-3"></div>
+        </div>
+
         <!-- Danger Zone -->
         <div class="mt-6 bg-white rounded-2xl shadow-sm border border-gray-100 p-6 animate-in" style="animation-delay:0.5s">
             <h3 class="text-sm font-bold text-brand-700 mb-1 flex items-center gap-2">
@@ -323,8 +352,134 @@
             this.value = this.value.replace(/\D/g, '').slice(0, 11);
         });
 
+        // ── Biletlerim: API'den çek ve göster ──
+        async function loadMyTickets() {
+            const loadingEl = document.getElementById('ticketsLoading');
+            const emptyEl = document.getElementById('ticketsEmpty');
+            const listEl = document.getElementById('ticketsList');
+
+            loadingEl.classList.remove('hidden');
+            emptyEl.classList.add('hidden');
+            listEl.classList.add('hidden');
+            listEl.innerHTML = '';
+
+            try {
+                const res = await fetch(`${API_BASE_URL}/tickets/my`, {
+                    headers: { 'Authorization': `Bearer ${getToken()}` }
+                });
+
+                if (!res.ok) {
+                    throw new Error('Biletler yüklenemedi');
+                }
+
+                const tickets = await res.json();
+                loadingEl.classList.add('hidden');
+
+                if (!tickets || tickets.length === 0) {
+                    emptyEl.classList.remove('hidden');
+                    return;
+                }
+
+                listEl.classList.remove('hidden');
+
+                tickets.forEach((ticket, i) => {
+                    const fromCity = ticket.fromStop?.terminal?.city?.name || '?';
+                    const toCity = ticket.toStop?.terminal?.city?.name || '?';
+                    const depTime = ticket.fromStop?.departureTime;
+                    const genderIcon = ticket.gender === 'male' ? '👨' : '👩';
+                    const genderLabel = ticket.gender === 'male' ? 'Erkek' : 'Kadın';
+                    const genderBg = ticket.gender === 'male' ? 'bg-blue-50 text-blue-700' : 'bg-pink-50 text-pink-700';
+
+                    let dateStr = '';
+                    let timeStr = '';
+                    if (depTime) {
+                        const d = new Date(depTime);
+                        dateStr = d.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
+                        timeStr = d.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+                    }
+
+                    const companyName = ticket.trip?.otobus?.company?.name || '—';
+
+                    const card = document.createElement('div');
+                    card.className = 'bg-gray-50 rounded-xl border border-gray-100 p-4 hover:shadow-md transition-all animate-in';
+                    card.style.animationDelay = `${i * 0.05}s`;
+
+                    card.innerHTML = `
+                        <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span class="text-xs font-semibold text-gray-400 bg-white px-2 py-0.5 rounded-md border border-gray-100">${companyName}</span>
+                                    <span class="text-xs font-medium ${genderBg} px-2 py-0.5 rounded-md">${genderIcon} ${genderLabel}</span>
+                                </div>
+                                <div class="flex items-center gap-2 text-sm">
+                                    <span class="font-bold text-navy-800">${fromCity}</span>
+                                    <svg class="w-4 h-4 text-brand-500 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+                                    <span class="font-bold text-navy-800">${toCity}</span>
+                                </div>
+                                <div class="flex flex-wrap items-center gap-3 mt-1.5 text-xs text-gray-400">
+                                    <span class="flex items-center gap-1">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                                        ${dateStr}
+                                    </span>
+                                    <span class="flex items-center gap-1">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                                        ${timeStr}
+                                    </span>
+                                    <span class="flex items-center gap-1">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 19.5v-15A2.5 2.5 0 016.5 2H20v20H6.5a2.5 2.5 0 01-2.5-2.5z"/></svg>
+                                        ${ticket.yolcuAdSoyad || '—'}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3 sm:flex-col sm:items-end">
+                                <div class="w-10 h-10 rounded-xl bg-navy-600 text-white text-sm font-bold flex items-center justify-center flex-shrink-0">
+                                    ${ticket.koltukNo}
+                                </div>
+                                <button onclick="cancelTicket(${ticket.id})" 
+                                    class="text-xs font-semibold text-brand-600 hover:text-brand-700 hover:bg-brand-50 px-3 py-1.5 rounded-lg transition cursor-pointer border border-brand-200">
+                                    İptal Et
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    listEl.appendChild(card);
+                });
+
+            } catch (err) {
+                loadingEl.classList.add('hidden');
+                console.error('Bilet yükleme hatası:', err);
+                showToast('Biletler yüklenirken hata oluştu.', 'error');
+            }
+        }
+
+        // Bilet iptal fonksiyonu (global scope)
+        window.cancelTicket = async function(ticketId) {
+            if (!confirm('Bu bileti iptal etmek istediğinize emin misiniz?')) return;
+
+            try {
+                const res = await fetch(`${API_BASE_URL}/tickets/cancel/${ticketId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${getToken()}` }
+                });
+
+                if (!res.ok) {
+                    const data = await res.json();
+                    throw new Error(data.message || 'Bilet iptal edilemedi.');
+                }
+
+                showToast('Bilet başarıyla iptal edildi!', 'success');
+                loadMyTickets(); // Listeyi yenile
+            } catch (err) {
+                showToast(err.message || 'Bilet iptal edilemedi.', 'error');
+            }
+        };
+
+        // Yenile butonu
+        document.getElementById('refreshTicketsBtn').addEventListener('click', loadMyTickets);
+
         // Başlat
         loadProfile();
+        loadMyTickets();
     })();
     </script>
 </body>
