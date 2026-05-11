@@ -120,16 +120,6 @@ public class TicketService {
             throw new RuntimeException("HATA: Bu koltuk numarası seçilen güzergah için dolu!");
         }
 
-        // 2b. KONTROL: Aynı TC ile aynı sefere zaten bilet alınmış mı?
-        if (request.getTcNo() != null && !request.getTcNo().isEmpty()) {
-            List<Ticket> allTicketsForTrip = ticketRepository.findByTripId(trip.getId());
-            boolean tcAlreadyBooked = allTicketsForTrip.stream()
-                    .anyMatch(t -> request.getTcNo().equals(t.getTcNo()));
-            if (tcAlreadyBooked) {
-                throw new RuntimeException("Bu T.C. kimlik numarası ile bu sefere zaten bilet alınmış!");
-            }
-        }
-
         // 3. Bilet oluştur ve kaydet
         Ticket bilet = new Ticket();
         bilet.setTrip(trip);

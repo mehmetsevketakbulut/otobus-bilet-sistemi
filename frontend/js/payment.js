@@ -1,12 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // ── Giriş kontrolü ──
-    const token = localStorage.getItem('jwt_token');
-    if (!token) {
-        alert('Bilet alabilmek için giriş yapmanız gerekmektedir.');
-        window.location.href = 'login.html';
-        return;
-    }
-
     // ── Retrieve booking data from sessionStorage ──
     const bookingRaw = sessionStorage.getItem('obilet_booking');
     if (!bookingRaw) {
@@ -223,14 +215,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const token = localStorage.getItem('jwt_token');
             if (token) {
                 try {
-                    const decoded = JSON.parse(atob(token.split('.')[1]));
-                    userId = decoded.userId || null;
+                    const payload = JSON.parse(atob(token.split('.')[1]));
+                    userId = payload.userId || null;
                 } catch(e) {}
             }
 
-            // Biletleri SIRAYLA al (sequential) - biri hata verirse geri kalanları alma
-            const boughtTickets = [];
-            for (const p of passengers) {
+            // Backend expects single ticket per request. We make requests for each passenger.
+            const buyPromises = passengers.map(p => {
                 const req = {
                     tripId: booking.tripId,
                     fromStopId: booking.fromStopId,
@@ -241,43 +232,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     tcNo: p.tcNo,
                     userId: userId
                 };
-
-                const response = await fetch(`${API_BASE_URL}/tickets/buy`, {
+                return fetchApi('/tickets/buy', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        ...(token ? { 'Authorization': `Bearer ${token}` } : {})
-                    },
                     body: JSON.stringify(req)
                 });
+            });
 
-                const contentType = response.headers.get('content-type');
-                let data;
-                if (contentType && contentType.includes('application/json')) {
-                    data = await response.json();
-                } else {
-                    const text = await response.text();
-                    data = { message: text || 'Bilet alınırken hata oluştu.' };
-                }
-
-                if (!response.ok) {
-                    // Hata varsa, zaten alınmış biletler varsa kullanıcıya bilgi ver
-                    if (boughtTickets.length > 0) {
-                        alert(`Koltuk ${p.seatNo} için hata: ${data.message || 'Bilinmeyen hata'}. Diğer ${boughtTickets.length} biletiniz başarıyla alındı.`);
-                        break;
-                    } else {
-                        throw new Error(data.message || 'Bilet alınırken hata oluştu.');
-                    }
-                }
-
-                boughtTickets.push({ ...p, ticketId: data.id });
-            }
-
-            if (boughtTickets.length > 0) {
-                // En az bir bilet alındıysa onay sayfasına git
-                const pnr = 'OB-' + Math.random().toString(36).substr(2, 6).toUpperCase();
-                goToConfirmation(pnr, boughtTickets);
-            }
+            // Wait for all tickets to be bought
+            const results = await Promise.all(buyPromises);
+            
+            // Go to confirmation page
+            const pnr = 'OB-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+            goToConfirmation(pnr, passengers);
             
         } catch (err) {
             console.error('Bilet kesilirken hata oluştu:', err);
@@ -321,8 +287,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function validateForm() {
         let valid = true;
-        let errorMessages = [];
-
         // Check TC numbers
         document.querySelectorAll('.tc-input').forEach(input => {
             if (!validateTC(input.value)) {
@@ -331,19 +295,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 valid = false;
             }
         });
-
-        // Aynı TC ile çift bilet kontrolü
-        const tcValues = [];
-        document.querySelectorAll('.tc-input').forEach(input => {
-            const tc = input.value.trim();
-            if (tc && tcValues.includes(tc)) {
-                input.classList.add('error');
-                errorMessages.push('Aynı T.C. kimlik numarası ile birden fazla bilet alınamaz!');
-                valid = false;
-            }
-            if (tc) tcValues.push(tc);
-        });
-
         // Check required fields
         document.querySelectorAll('#paymentForm [required]').forEach(f => {
             if (!f.value.trim()) {
@@ -353,66 +304,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 f.classList.remove('error');
             }
         });
-
         // Email check
         const email = document.getElementById('contactEmail');
         if (email.value && !email.value.includes('@')) {
             email.classList.add('error');
             valid = false;
         }
-
         // Card number check (16 digits)
         if (cardNumberInput.value.replace(/\s/g, '').length !== 16) {
             cardNumberInput.classList.add('error');
             valid = false;
         }
-
-        // Kart son kullanma tarihi validasyonu
-        const expiryVal = cardExpiryInput.value;
-        if (expiryVal) {
-            const parts = expiryVal.split('/');
-            if (parts.length !== 2) {
-                cardExpiryInput.classList.add('error');
-                errorMessages.push('Geçersiz son kullanma tarihi formatı (AA/YY).');
-                valid = false;
-            } else {
-                const month = parseInt(parts[0], 10);
-                const year = parseInt(parts[1], 10);
-
-                // Ay 1-12 arası olmalı
-                if (isNaN(month) || month < 1 || month > 12) {
-                    cardExpiryInput.classList.add('error');
-                    errorMessages.push('Geçersiz ay! Ay 01-12 arasında olmalıdır.');
-                    valid = false;
-                }
-
-                // Geçmiş tarih kontrolü
-                if (!isNaN(month) && !isNaN(year)) {
-                    const now = new Date();
-                    const currentMonth = now.getMonth() + 1;
-                    const currentYear = now.getFullYear() % 100; // 2 haneli yıl
-                    if (year < currentYear || (year === currentYear && month < currentMonth)) {
-                        cardExpiryInput.classList.add('error');
-                        errorMessages.push('Kartınızın son kullanma tarihi geçmiş!');
-                        valid = false;
-                    }
-                }
-            }
-        } else {
-            cardExpiryInput.classList.add('error');
-            valid = false;
-        }
-
         // CVV check
         if (cardCvvInput.value.length < 3) {
             cardCvvInput.classList.add('error');
             valid = false;
         }
-
         if (!valid) {
-            if (errorMessages.length > 0) {
-                alert(errorMessages[0]);
-            }
             // Scroll to first error
             const firstError = document.querySelector('.error');
             if (firstError) firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });

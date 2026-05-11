@@ -55,24 +55,6 @@ function getUserRole() {
 }
 
 /**
- * Checks if user's email is verified from token
- */
-function isEmailVerified() {
-    const token = getToken();
-    const decoded = decodeToken(token);
-    return decoded ? decoded.emailVerified === true : false;
-}
-
-/**
- * Gets user email from token
- */
-function getUserEmail() {
-    const token = getToken();
-    const decoded = decodeToken(token);
-    return decoded ? decoded.sub : null;
-}
-
-/**
  * Base fetch wrapper that automatically adds Authorization header
  */
 async function fetchApi(endpoint, options = {}) {

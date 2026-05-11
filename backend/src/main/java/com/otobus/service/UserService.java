@@ -14,10 +14,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 @Service
 public class UserService {
@@ -27,26 +25,14 @@ public class UserService {
         private final JwtUtil jwtUtil;
         private final PasswordEncoder passwordEncoder;
         private final AuthenticationManager authenticationManager;
-        private final EmailService emailService;
 
         public UserService(UserRepository userRepository, CompanyRepository companyRepository, JwtUtil jwtUtil,
-                        PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager,
-                        EmailService emailService) {
+                        PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager) {
                 this.userRepository = userRepository;
                 this.companyRepository = companyRepository;
                 this.jwtUtil = jwtUtil;
                 this.passwordEncoder = passwordEncoder;
                 this.authenticationManager = authenticationManager;
-                this.emailService = emailService;
-        }
-
-        /**
-         * 6 haneli rastgele doğrulama kodu üretir
-         */
-        private String generateVerificationCode() {
-                Random random = new Random();
-                int code = 100000 + random.nextInt(900000);
-                return String.valueOf(code);
         }
 
         public AuthResponse register(RegisterRequest request) {
@@ -63,18 +49,12 @@ public class UserService {
                         }
                 }
 
-                // Doğrulama kodu üret
-                String verificationCode = generateVerificationCode();
-
                 User user = User.builder()
                                 .fullName(request.getFullName())
                                 .email(request.getEmail())
                                 .phoneNumber(request.getPhoneNumber())
                                 .password(passwordEncoder.encode(request.getPassword()))
                                 .role(userRole)
-                                .emailVerified(false)
-                                .verificationCode(verificationCode)
-                                .verificationCodeExpiry(LocalDateTime.now().plusMinutes(10))
                                 .build();
 
                 userRepository.save(user);
@@ -86,85 +66,13 @@ public class UserService {
                         companyRepository.save(company);
                 }
 
-                // Doğrulama mailini gönder
-                try {
-                        emailService.sendVerificationEmail(user.getEmail(), verificationCode);
-                } catch (Exception e) {
-                        System.err.println("E-posta gönderilemedi: " + e.getMessage());
-                        // Mail gönderilemese bile kayıt devam eder, tekrar kod isteyebilir
-                }
-
                 Map<String, Object> extraClaims = new HashMap<>();
                 extraClaims.put("role", user.getRole().name());
-                extraClaims.put("emailVerified", false);
-                extraClaims.put("userId", user.getId());
 
                 String jwtToken = jwtUtil.generateToken(extraClaims, user);
                 return AuthResponse.builder()
                                 .token(jwtToken)
-                                .emailVerified(false)
                                 .build();
-        }
-
-        /**
-         * Email doğrulama: kullanıcının girdiği kodu kontrol eder
-         */
-        public AuthResponse verifyEmail(String email, String code) {
-                User user = userRepository.findByEmail(email)
-                                .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı!"));
-
-                if (user.isEmailVerified()) {
-                        throw new RuntimeException("E-posta zaten doğrulanmış.");
-                }
-
-                if (user.getVerificationCode() == null || user.getVerificationCodeExpiry() == null) {
-                        throw new RuntimeException("Doğrulama kodu bulunamadı. Lütfen yeni kod isteyin.");
-                }
-
-                if (LocalDateTime.now().isAfter(user.getVerificationCodeExpiry())) {
-                        throw new RuntimeException("Doğrulama kodunun süresi dolmuş. Lütfen yeni kod isteyin.");
-                }
-
-                if (!user.getVerificationCode().equals(code)) {
-                        throw new RuntimeException("Doğrulama kodu hatalı!");
-                }
-
-                // Doğrulama başarılı
-                user.setEmailVerified(true);
-                user.setVerificationCode(null);
-                user.setVerificationCodeExpiry(null);
-                userRepository.save(user);
-
-                // Yeni token oluştur (emailVerified=true ile)
-                Map<String, Object> extraClaims = new HashMap<>();
-                extraClaims.put("role", user.getRole().name());
-                extraClaims.put("emailVerified", true);
-                extraClaims.put("userId", user.getId());
-
-                String jwtToken = jwtUtil.generateToken(extraClaims, user);
-                return AuthResponse.builder()
-                                .token(jwtToken)
-                                .emailVerified(true)
-                                .build();
-        }
-
-        /**
-         * Doğrulama kodunu yeniden gönder
-         */
-        public void resendVerificationCode(String email) {
-                User user = userRepository.findByEmail(email)
-                                .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı!"));
-
-                if (user.isEmailVerified()) {
-                        throw new RuntimeException("E-posta zaten doğrulanmış.");
-                }
-
-                String newCode = generateVerificationCode();
-                user.setVerificationCode(newCode);
-                user.setVerificationCodeExpiry(LocalDateTime.now().plusMinutes(10));
-                userRepository.save(user);
-
-                emailService.sendVerificationEmail(user.getEmail(), newCode);
         }
 
         public AuthResponse login(LoginRequest request) {
@@ -184,13 +92,10 @@ public class UserService {
 
                 Map<String, Object> extraClaims = new HashMap<>();
                 extraClaims.put("role", user.getRole().name());
-                extraClaims.put("emailVerified", user.isEmailVerified());
-                extraClaims.put("userId", user.getId());
 
                 String jwtToken = jwtUtil.generateToken(extraClaims, user);
                 return AuthResponse.builder()
                                 .token(jwtToken)
-                                .emailVerified(user.isEmailVerified())
                                 .build();
         }
 }
