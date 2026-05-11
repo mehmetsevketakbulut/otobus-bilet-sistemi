@@ -7,7 +7,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Column;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 public class Ticket {
@@ -18,7 +17,6 @@ public class Ticket {
 
     @ManyToOne
     @JoinColumn(name = "trip_id")
-    @JsonIgnoreProperties({"stops"})
     private Trip trip;
 
     private String yolcuAdSoyad;
@@ -41,7 +39,6 @@ public class Ticket {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    @JsonIgnoreProperties({"password", "verificationCode", "verificationCodeExpiry", "authorities", "accountNonExpired", "accountNonLocked", "credentialsNonExpired", "enabled", "username"})
     private User user;
 
     // --- Getter ve Setter ---

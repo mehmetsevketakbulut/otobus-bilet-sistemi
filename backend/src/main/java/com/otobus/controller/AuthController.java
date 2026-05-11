@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Map;
-
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -30,25 +28,5 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
         return ResponseEntity.ok(userService.login(request));
-    }
-
-    /**
-     * E-posta doğrulama kodu kontrolü
-     */
-    @PostMapping("/verify-email")
-    public ResponseEntity<AuthResponse> verifyEmail(@RequestBody Map<String, String> request) {
-        String email = request.get("email");
-        String code = request.get("code");
-        return ResponseEntity.ok(userService.verifyEmail(email, code));
-    }
-
-    /**
-     * Doğrulama kodunu yeniden gönder
-     */
-    @PostMapping("/resend-code")
-    public ResponseEntity<Map<String, String>> resendCode(@RequestBody Map<String, String> request) {
-        String email = request.get("email");
-        userService.resendVerificationCode(email);
-        return ResponseEntity.ok(Map.of("message", "Doğrulama kodu tekrar gönderildi."));
     }
 }

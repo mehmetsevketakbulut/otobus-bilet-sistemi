@@ -1,6 +1,5 @@
 package com.otobus.entity;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -16,7 +15,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -44,14 +42,6 @@ public class User implements UserDetails {
 
     @Enumerated(EnumType.STRING)
     private Role role;
-
-    @Builder.Default
-    @Column(nullable = false)
-    private boolean emailVerified = false;
-
-    private String verificationCode;
-
-    private LocalDateTime verificationCodeExpiry;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -85,6 +75,6 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true; // Hesap her zaman aktif, emailVerified ayrı kontrol ediliyor
+        return true;
     }
 }
