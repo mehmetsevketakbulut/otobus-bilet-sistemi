@@ -30,16 +30,19 @@ public class TicketService {
     private final AuditLogService auditLogService;
     private final NotificationService notificationService;
     private final PaymentService paymentService;
+    private final EmailService emailService;
 
     public TicketService(TicketRepository ticketRepository, TripRepository tripRepository,
                          UserRepository userRepository, AuditLogService auditLogService,
-                         NotificationService notificationService, PaymentService paymentService) {
+                         NotificationService notificationService, PaymentService paymentService,
+                         EmailService emailService) {
         this.ticketRepository = ticketRepository;
         this.tripRepository = tripRepository;
         this.userRepository = userRepository;
         this.auditLogService = auditLogService;
         this.notificationService = notificationService;
         this.paymentService = paymentService;
+        this.emailService = emailService;
     }
 
     /**
@@ -176,6 +179,17 @@ public class TicketService {
             notificationService.createNotification(user, "Bilet Satın Alındı",
                     "Biletiniz başarıyla satın alınmıştır. Koltuk No: " + request.getKoltukNo(),
                     "TICKET_PURCHASE");
+                    
+            // E-Posta Gönderimi
+            try {
+                String ticketDetails = "Güzergah: " + fromStop.getTerminal().getCity().getName() + " - " + toStop.getTerminal().getCity().getName() + "\n" +
+                                       "Tarih / Saat: " + trip.getKalkisSaati().toString() + "\n" +
+                                       "Koltuk No: " + request.getKoltukNo() + "\n" +
+                                       "Yolcu: " + request.getYolcuAdSoyad();
+                emailService.sendTicketConfirmation(user.getEmail(), ticketDetails);
+            } catch (Exception e) {
+                System.err.println("Bilet e-postası gönderilirken hata oluştu: " + e.getMessage());
+            }
         }
 
         return savedTicket;

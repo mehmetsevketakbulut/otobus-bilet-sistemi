@@ -270,13 +270,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
 
-                boughtTickets.push({ ...p, ticketId: data.id });
+                boughtTickets.push({ 
+                    ...p, 
+                    ticketId: data.id,
+                    pnr: 'OB-' + Math.random().toString(36).substr(2, 6).toUpperCase()
+                });
             }
 
             if (boughtTickets.length > 0) {
                 // En az bir bilet alındıysa onay sayfasına git
-                const pnr = 'OB-' + Math.random().toString(36).substr(2, 6).toUpperCase();
-                goToConfirmation(pnr, boughtTickets);
+                goToConfirmation(null, boughtTickets);
             }
             
         } catch (err) {

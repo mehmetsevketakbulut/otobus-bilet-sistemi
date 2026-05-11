@@ -262,9 +262,11 @@
 
         function setActive(btn) {
             [btnToday, btnTomorrow].forEach(b => {
-                b.className = b.className.replace(/border-brand-500 bg-brand-50 text-brand-600/g, 'border-gray-200 bg-white text-navy-700');
+                b.classList.remove('border-brand-500', 'bg-brand-50', 'text-brand-600');
+                b.classList.add('border-gray-200', 'bg-white', 'text-navy-700');
             });
-            btn.className = btn.className.replace(/border-gray-200 bg-white text-navy-700/g, 'border-brand-500 bg-brand-50 text-brand-600');
+            btn.classList.remove('border-gray-200', 'bg-white', 'text-navy-700');
+            btn.classList.add('border-brand-500', 'bg-brand-50', 'text-brand-600');
         }
 
         btnToday.addEventListener('click', () => { dateInput.value = todayStr; setActive(btnToday); });

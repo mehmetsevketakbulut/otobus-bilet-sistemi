@@ -205,6 +205,7 @@
             const dayStr = dateObj.toLocaleDateString('tr-TR', { weekday: 'long' });
 
             (data.passengers || []).forEach((p, idx) => {
+                const ticketPnr = p.pnr || data.pnr || 'OB-XXXX';
                 const genderIcon = p.gender === 'male' ? '👨' : '👩';
                 const fullName = `${(p.firstName || 'Yolcu').toUpperCase()} ${(p.lastName || '').toUpperCase()}`;
                 const qrId = `qr-${idx}`;
@@ -285,7 +286,7 @@
 
                             <div class="text-center">
                                 <p class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold mb-1">PNR Kodu</p>
-                                <p class="text-2xl font-extrabold text-brand-600 tracking-wider font-mono">${data.pnr || 'OB-XXXX'}</p>
+                                <p class="text-2xl font-extrabold text-brand-600 tracking-wider font-mono">${ticketPnr}</p>
                             </div>
 
                             <canvas id="${qrId}" class="qr-fake rounded-lg" width="100" height="100" style="width:100px; height:100px;"></canvas>
@@ -298,7 +299,7 @@
                 container.appendChild(pass);
 
                 // Draw fake QR code
-                setTimeout(() => drawFakeQR(qrId, data.pnr + '-' + p.seatNo), 100);
+                setTimeout(() => drawFakeQR(qrId, ticketPnr + '-' + p.seatNo), 100);
             });
         }
 

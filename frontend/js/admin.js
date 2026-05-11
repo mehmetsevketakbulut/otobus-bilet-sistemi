@@ -5,13 +5,13 @@
 
 // ── Protected API helper with Bearer token ──
 function adminFetch(endpoint, options = {}) {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('jwt_token');
     const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
     if (token) headers['Authorization'] = `Bearer ${token}`;
     return fetch(`${typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : '/api'}${endpoint}`, { ...options, headers })
         .then(r => {
             if (r.status === 401 || r.status === 403) {
-                localStorage.removeItem('token');
+                localStorage.removeItem('jwt_token');
                 location.href = 'login.html';
                 throw new Error('Yetki hatası');
             }
@@ -22,7 +22,7 @@ function adminFetch(endpoint, options = {}) {
 
 document.addEventListener('DOMContentLoaded', () => {
     // Auth kontrolü — Token yoksa veya ADMIN değilse yönlendir
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('jwt_token');
     if (!token) { location.href = 'login.html'; return; }
     try {
         const payload = JSON.parse(atob(token.split('.')[1]));

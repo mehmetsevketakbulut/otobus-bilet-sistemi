@@ -146,8 +146,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         filtered.sort((a, b) => {
             if (currentSort === 'price-asc') return a.price - b.price;
             if (currentSort === 'price-desc') return b.price - a.price;
-            const timeA = (a.time || '00:00').replace(':', '');
-            const timeB = (b.time || '00:00').replace(':', '');
+            
+            let timeAStr = a.time;
+            if (!timeAStr && a.departureTime) timeAStr = new Date(a.departureTime).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+            const timeA = parseInt((timeAStr || '00:00').replace(':', ''), 10);
+            
+            let timeBStr = b.time;
+            if (!timeBStr && b.departureTime) timeBStr = new Date(b.departureTime).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+            const timeB = parseInt((timeBStr || '00:00').replace(':', ''), 10);
+
             if (currentSort === 'time-asc') return timeA - timeB;
             if (currentSort === 'time-desc') return timeB - timeA;
             return 0;

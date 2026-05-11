@@ -64,7 +64,7 @@
         </button>
     </nav>
     <div class="p-4 border-t border-white/5">
-        <button onclick="localStorage.removeItem('token');location.href='login.html'" class="w-full flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm text-gray-600 hover:text-red-400 hover:bg-white/5 transition cursor-pointer">
+        <button onclick="localStorage.removeItem('jwt_token');location.href='login.html'" class="w-full flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm text-gray-600 hover:text-red-400 hover:bg-white/5 transition cursor-pointer">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
             Çıkış Yap
         </button>
@@ -204,7 +204,7 @@
                 <div class="space-y-4">
                     <div class="flex items-center justify-between py-3 border-b border-white/5"><span class="text-sm">Komisyon Oranı (%)</span><input type="number" value="3" min="0" max="20" class="input-a w-20 px-2 py-1.5 rounded-lg text-xs text-center outline-none"></div>
                     <div class="flex items-center justify-between py-3 border-b border-white/5"><span class="text-sm">Hizmet Bedeli (₺)</span><input type="number" value="9.90" step="0.1" class="input-a w-20 px-2 py-1.5 rounded-lg text-xs text-center outline-none"></div>
-                    <div class="flex items-center justify-between py-3"><span class="text-sm">Bakım Modu</span><button onclick="this.classList.toggle('bg-indigo-600');this.classList.toggle('bg-gray-700')" class="w-11 h-6 bg-gray-700 rounded-full relative cursor-pointer transition"><span class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform"></span></button></div>
+                    <div class="flex items-center justify-between py-3"><span class="text-sm">Bakım Modu</span><button id="maintenanceBtn" onclick="toggleMaintenance(this)" class="w-11 h-6 bg-gray-700 rounded-full relative cursor-pointer transition"><span class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform duration-300"></span></button></div>
                 </div>
             </div>
         </div>
@@ -213,5 +213,23 @@
 
 <script src="js/api.js"></script>
 <script src="js/admin.js"></script>
+<script>
+function toggleMaintenance(btn) {
+    btn.classList.toggle('bg-brand-600');
+    btn.classList.toggle('bg-gray-700');
+    btn.querySelector('span').classList.toggle('translate-x-5');
+    localStorage.setItem('maintenance_mode', btn.classList.contains('bg-brand-600'));
+}
+document.addEventListener('DOMContentLoaded', () => {
+   if (localStorage.getItem('maintenance_mode') === 'true') {
+       const btn = document.getElementById('maintenanceBtn');
+       if(btn) { 
+           btn.classList.add('bg-brand-600'); 
+           btn.classList.remove('bg-gray-700'); 
+           btn.querySelector('span').classList.add('translate-x-5'); 
+       }
+   }
+});
+</script>
 </body>
 </html>

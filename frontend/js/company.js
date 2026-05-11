@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ── Logout ──
     document.getElementById('logoutBtn').addEventListener('click', () => {
-        localStorage.removeItem('token');
+        localStorage.removeItem('jwt_token');
         window.location.href = 'login.html';
     });
 });
